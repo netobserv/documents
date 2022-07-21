@@ -54,91 +54,48 @@ kubectl apply -f hack/lokistack_dev.yaml
 
 This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
-## Loki Operator on Openshift (WIP, gateway is [still unstable](https://github.com/ViaQ/loki-operator/pull/100/) and configuration may change)
+## Loki Operator on Openshift with gateway
 Loki operator on Openshift will allow you to configure [gateway](https://github.com/observatorium/api) for loki multi-tenancy & authentication
 
-Check [Docs](https://github.com/ViaQ/loki-operator/tree/master/docs)
+Check [Docs](https://loki-operator.dev/docs/prologue/introduction.md/)
 
 ### Requirements
 - Install oc CLI for communicating with the cluster.
 - Running Openshift cluster
-- [Configured DEX](./hack_dex.md)
-- A container registry that you and your openshift cluster can reach.
 
 ### Setup
-Since loki-operator is not already available on operator hub, you will need to build it from sources for now.
 
-Clone loki-operator repository and deploy
-```bash
-git clone https://github.com/ViaQ/loki-operator.git
-cd loki-operator
-make olm-deploy REGISTRY_ORG=$YOUR_QUAY_ORG VERSION=$VERSION
+Install loki operator using Operator Hub. Open Openshift Console and move to 
+Administrator view -> Operators -> OperatorHub
+Search for `loki`. You should find `Loki Operator` in `Red Hat` catalog.
+
+Install the operator with default configuration.
+
+Create a namespace called `openshift-logging`:
+```
+kubectl create ns openshift-logging
 ```
 
-[Create DEX instance](https://github.com/netobserv/documents/blob/main/hack_dex.md#create-dex-instance) in the `openshift-logging` namespace 
+Then create a `LokiStack` in `openshift-logging` namespace from:
+Administrator view -> Operators -> Installed Operators -> Loki Operator -> LokiStack -> Create LokiStack
+- ensure the name is `lokistack`
+- set `Object Storage` -> `Secret`. Check [documentation](https://loki-operator.dev/docs/object_storage.md/).
+- ensure `Tenants Configuration` -> `Mode` is set to `openshift-logging`
 
-Create aws bucket and secret. You can check [deploy-example-secret.sh](https://github.com/ViaQ/loki-operator/blob/master/hack/deploy-example-secret.sh) for infos.
-Example with us-east-1 region for netobserv-loki bucket:
-```bash
-aws s3api create-bucket --bucket netobserv-loki --region us-east-1
-oc -n openshift-logging create secret generic test --from-literal=endpoint="https://s3.us-east-1.amazonaws.com" --from-literal=region="us-east-1" --from-literal=bucketnames="netobserv-loki" --from-literal=access_key_id="XXXXXXXXXXXXXXXXXXXX" --from-literal=access_key_secret="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+This will create `gateway`, `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
+
+To allow `flowlogs-pipeline` to write to the gateway and `network-observability-plugin` to read from the gateway, you will need to create related `ClusterRole` and `ClusterRoleBinding` using:
+```
+oc apply -f examples/loki-role.yaml
 ```
 
-If you want to use internal HTTP urls, remove `--with-cert-signing-service`, `--with-service-monitors` and `--with-tls-service-monitors` flags in `config/overlays/openshift/manager_run_flags_patch.yaml`. 
-Your container spec should look like this :
+Then you will be able to set the following configuration in `FlowCollector` for `application` tenant:
 ```yaml
-      containers:
-        - name: manager
-          args:
-          - "--with-lokistack-gateway"
-          - "--with-lokistack-gateway-route"
+  loki:
+    tenantID: application
+    sendAuthToken: true
+    url: 'https://lokistack-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/application/'
 ```
-Else you will have to create reencrypt routes to access services.
-
-Create tenant secret with cliendID, clientSecret and ca according to your dex configuration:
-```bash
-oc create -n openshift-logging secret generic tenant-a --from-literal=clientID="tenant-a"  --from-literal=clientSecret="password" --from-literal=issuerCAPath=""
-```
-`issuerCAPath` can be left empty if you want to use server default API CA file. Else use relative path in gateway pod.
-
-Update `oidc secret name`, `issuerURL` and `redirectURL` routes in `hack/lokistack_gateway_dev.yaml`:
-```yaml
-    secret:
-        name: tenant-a
-    issuerURL: https://dex-openshift-logging.apps.<MY_CLUSTER_URL>/dex/
-    redirectURL:  http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/oidc/tenant-a/callback
-```
-You can check `examples/lokistack_gateway.yaml` in this repository for a compatible configuration with static users created in `examples/dex.yaml`. 
-`usernameClaim` will take dex email and `groupClaim` is empty since DEX staticPasswords doesn't support groups.
-`subjects` users are taken from Openshift users matching with identities.
-
-Create LokiStack instance with static mode:
-```bash
-oc -n openshift-logging apply -f hack/lokistack_gateway_dev.yaml
-```
-
-OR
-
-Open your Openshift Administrator Console and go to:
-    Installed Operators => Openshift Loki Operator (in openshift-logging namespace) 
-    Click on `Create instance` in LokiStacks card
-    Copy / Paste `hack/lokistack_gateway_dev.yaml` content from sources to YAML tab
-
-This will create `distributor`, `compactor`, `ingester`, `querier`, `query-frontend` and `lokistack-gateway` components.
-
-Create gateway and gateway-status routes:
-```bash
-oc -n openshift-logging apply -f examples/gateway_routes.yaml
-```
-
-Gateway status will be available at:
-`http://gateway-status-openshift-logging.apps.<MY_CLUSTER_URL>`
-
-Loki will now be exposed at `api/logs/v1/tenant-a`. You can now open a private navigation and try the following url in your browser:
-`http://gateway-openshift-logging.apps.<MY_CLUSTER_URL>/api/logs/v1/tenant-a/loki/api/v1/labels`
-You will be redirected to DEX login before accessing this resource. It should return `status "success"`
-
-Check all available routes in [api/logs/v1/http.go](https://github.com/observatorium/api/blob/main/api/logs/v1/http.go#L132)
 
 ### Troubleshooting
 - Logs are by default `--log.level=warn`. 
