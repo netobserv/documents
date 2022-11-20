@@ -33,9 +33,10 @@ spec:
       log.cleaner.io.buffer.load.factor: 0.9
       log.cleaner.threads: 8
       log.cleanup.policy: delete
+      log.retention.bytes: 107374182400
       log.retention.check.interval.ms: 300000
       log.retention.ms: 1680000
-      log.roll.ms: 259200000
+      log.roll.ms: 7200000
       log.segment.bytes: 1073741824
     storage:
       type: persistent-claim 
