@@ -55,63 +55,8 @@ kubectl apply -f hack/lokistack_dev.yaml
 This will create `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
 ## Loki Operator on Openshift with gateway
-Loki operator on Openshift will allow you to configure [gateway](https://github.com/observatorium/api) for loki multi-tenancy & authentication
 
-Check [Docs](https://loki-operator.dev/docs/prologue/introduction.md/)
-
-### Requirements
-- Install oc CLI for communicating with the cluster.
-- Running Openshift cluster
-
-### Setup
-
-Install loki operator using Operator Hub. Open Openshift Console and move to 
-Administrator view -> Operators -> OperatorHub
-Search for `loki`. You should find `Loki Operator` in `Red Hat` catalog.
-
-Install the operator with default configuration.
-
-Create a namespace called `openshift-logging`:
-```
-kubectl create ns openshift-logging
-```
-
-Then create a `LokiStack` in `openshift-logging` namespace from:
-Administrator view -> Operators -> Installed Operators -> Loki Operator -> LokiStack -> Create LokiStack
-- ensure the name is `lokistack-network`
-- set `Object Storage` -> `Secret`. Check [documentation](https://loki-operator.dev/docs/object_storage.md/).
-- ensure `Tenants Configuration` -> `Mode` is set to `openshift-network`
-
-This will create `gateway`, `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
-
-To allow `flowlogs-pipeline` to write to the gateway and `network-observability-plugin` to read from the gateway, you will need to create related `ClusterRole` and `ClusterRoleBinding` using:
-```
-oc apply -f examples/loki-role.yaml
-```
-
-Then you will be able to set the following configuration in `FlowCollector` for `network` tenant:
-```yaml
-  loki:
-    sendAuthToken: true
-    url: 'https://lokistack-network-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/network/'
-    statusUrl: 'https://lokistack-network-query-frontend-http.openshift-logging.svc.cluster.local:3100'
-```
-
-### Troubleshooting
-- Logs are by default `--log.level=warn`. 
-You can set `--log.level=debug` in `gateway.go` and `opa_openshift.go` to get more logs.
-
-- AWS region not set for deploy-example-secret.sh
-If `aws configure get region` returns blank, the shell will fail. 
-You can force region using `aws configure --region us-east-1` for example.
-
-- Insuffisant CPU or Memory
-If your pods hang in `Pending` state, you should double check their status using `oc describe`
-We recommand to use size: 1x.extra-small but this still require a lot of ressources. 
-You can decrese them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
-
-- Certificate errors in Gateway logs
-Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
+Content moved to [loki_operator.md](./loki_operator.md).
 
 ## Loki & Grafana stack with Helm
 

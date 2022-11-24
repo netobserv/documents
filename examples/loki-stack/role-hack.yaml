@@ -2,12 +2,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: lokistack-netobserv-tenant-logs
+  name: loki-netobserv-tenant
 rules:
 - apiGroups:
   - 'loki.grafana.com'
   resources:
-  - network
+  - infrastructure
   resourceNames:
   - logs
   verbs:
@@ -17,15 +17,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: lokistack-netobserv-tenant-logs
+  name: loki-netobserv-tenant
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: lokistack-netobserv-tenant-logs
+  name: loki-netobserv-tenant
 subjects:
 - kind: ServiceAccount
   name: flowlogs-pipeline
-  namespace: network-observability
+  namespace: netobserv
 - kind: ServiceAccount
   name: network-observability-plugin
-  namespace: network-observability
+  namespace: netobserv
