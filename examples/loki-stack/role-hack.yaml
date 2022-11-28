@@ -27,5 +27,5 @@ subjects:
   name: flowlogs-pipeline
   namespace: netobserv
 - kind: ServiceAccount
-  name: network-observability-plugin
+  name: netobserv-plugin
   namespace: netobserv
