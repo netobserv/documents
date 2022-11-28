@@ -92,7 +92,7 @@ Then you will be able to set the following configuration in `FlowCollector` for 
     # temporary hack: for infrastructure tenant, use `url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/infrastructure/'` instead
     statusUrl: 'https://loki-query-frontend-http.netobserv.svc:3100'
     tenantID: network
-    # temporary hack: for infrastructure tenant, use infrastructure
+    # temporary hack: for infrastructure tenant, use `tenantID: infrastructure`
     authToken: HOST
     tls:
       enable: true
