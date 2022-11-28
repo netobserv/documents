@@ -106,10 +106,8 @@ Then you will be able to set the following configuration in `FlowCollector` for 
 
 - Logs are by default `--log.level=warn`. 
 You can set `--log.level=debug` in `gateway.go` and `opa_openshift.go` to get more logs.
-// TODO: do the same without modifying code?
 
 - AWS region not set for deploy-example-secret.sh
-// TODO: not sure what this script is... In my hack script, region is passed as a parameter
 If `aws configure get region` returns blank, the shell will fail. 
 You can force region using `aws configure --region us-east-1` for example.
 
@@ -117,7 +115,6 @@ You can force region using `aws configure --region us-east-1` for example.
 If your pods hang in `Pending` state, you should double check their status using `oc describe`
 We recommand to use size: 1x.extra-small but this still requires a lot of resources. 
 You can decrease them in internal/manifests/internal/sizes.go and set `100m` for each CPUs and `256Mi` for each Memories
-// TODO: do the same without modifying code? When extra-small is still too small, single nodes / kind?
 
 - Certificate errors in Gateway logs
 Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
