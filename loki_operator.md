@@ -89,7 +89,7 @@ Then you will be able to set the following configuration in `FlowCollector` for 
 ```yaml
   loki:
     url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network/'
-    # temporary hack: for infrastructure tenant, use 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/infrastructure/' instead
+    # temporary hack: for infrastructure tenant, use `url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/infrastructure/'` instead
     statusUrl: 'https://loki-query-frontend-http.netobserv.svc:3100'
     tenantID: network
     # temporary hack: for infrastructure tenant, use infrastructure
