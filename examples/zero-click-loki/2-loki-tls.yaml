@@ -128,6 +128,13 @@ spec:
         - mountPath: "/var/serving-cert"
           name: certs
           readOnly: true
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
 ---
 kind: Service
 apiVersion: v1

@@ -119,6 +119,13 @@ spec:
           name: loki-store
         - mountPath: "/etc/loki"
           name: loki-config
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
 ---
 kind: Service
 apiVersion: v1
