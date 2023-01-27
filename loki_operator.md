@@ -6,8 +6,6 @@ The Loki Operator integrates a [gateway](https://github.com/observatorium/api) t
 
 NetObserv requires to use a specific tenant for Loki, named `network`, which uses a specific tenant mode implemented in Loki Operator 5.6+. For that reason, NetObserv is not compatible with prior version of the Loki Operator.
 
-Since 5.6 is not yet released, for testing purpose only you can use another tenant as a temporary hack. It shouldn't be used as such in production: in that case, we recommend to not use the Loki Operator, and use [Loki distributed deployment](./loki_distributed.md) instead.
-
 ## Installing Loki Operator
 
 Install the Loki operator using Operator Hub. If using OpenShift, open the Console and navigate to Administrator view -> Operators -> OperatorHub.
@@ -69,7 +67,7 @@ Administrator view -> Operators -> Installed Operators -> Loki Operator -> LokiS
 - Name it `loki` (any name is fine, but you need to adapt the URLs below accordingly)
 - Choose the size. While not suitable for production, `1x.extra-small` is OK for testing / demo. Note that very small clusters (e.g. 3 worker nodes) require `1x.extra-small`, see [troubleshooting](#troubleshooting) section below.
 - Set `Object Storage` -> `Secret` as noted above.
-- Set `Tenants Configuration` -> `Mode` to `openshift-network`. As a temporary hack, until `openshift-network` is available (expected in 5.6+), you can use `openshift-logging` instead. Just don't do that in production.
+- Set `Tenants Configuration` -> `Mode` to `openshift-network`.
 
 This will create `gateway`, `distributor`, `compactor`, `ingester`, `querier` and `query-frontend` components.
 
@@ -77,7 +75,6 @@ To allow `flowlogs-pipeline` to write to the gateway and `network-observability-
 
 ```bash
 kubectl apply -f examples/loki-stack/role.yaml
-# or as a temporary hack until `openshift-network` tenant mode is available (expected in 5.6+), use "examples/loki-stack/role-hack.yaml" instead.
 ```
 
 ## NetObserv configuration
@@ -89,16 +86,14 @@ Then you will be able to set the following configuration in `FlowCollector` for 
 ```yaml
   loki:
     url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network/'
-    # temporary hack: for infrastructure tenant, use `url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/infrastructure/'` instead
     statusUrl: 'https://loki-query-frontend-http.netobserv.svc:3100'
     tenantID: network
-    # temporary hack: for infrastructure tenant, use `tenantID: infrastructure`
     authToken: HOST
     tls:
       enable: true
       caCert:
         type: configmap
-        name: loki-ca-bundle
+        name: loki-gateway-ca-bundle
         certFile: service-ca.crt
 ```
 

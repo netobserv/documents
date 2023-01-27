@@ -29,27 +29,22 @@ kubectl create -n $NAMESPACE secret generic ${SECRET} \
   --from-literal=access_key_secret="${AWS_SECRET}" \
   --from-literal=region="${AWS_REGION}"
 
-kubectl apply -n $NAMESPACE -f examples/loki-stack/demo-hack.yaml
-kubectl apply -n $NAMESPACE -f examples/loki-stack/role-hack.yaml
-
-echo ""
-echo "⏳ Waiting for LokiStack being ready..."
-
-kubectl wait --timeout=180s --for=condition=ready lokistack loki -n $NAMESPACE
+kubectl apply -n $NAMESPACE -f examples/loki-stack/demo.yaml
+kubectl apply -n $NAMESPACE -f examples/loki-stack/role.yaml
 
 echo ""
 echo "Deployment complete"
 echo ""
 echo "Configure FlowCollector Loki with:"
-echo "    url: 'https://loki-gateway-http.${NAMESPACE}.svc:8080/api/logs/v1/infrastructure/'"
+echo "    url: 'https://loki-gateway-http.${NAMESPACE}.svc:8080/api/logs/v1/network/'"
 echo "    statusUrl: 'https://loki-query-frontend-http.${NAMESPACE}.svc:3100/'"
-echo "    tenantID: infrastructure"
+echo "    tenantID: network"
 echo "    authToken: HOST"
 echo "    tls:"
 echo "      enable: true"
 echo "      caCert:"
 echo "        type: configmap"
-echo "        name: loki-ca-bundle"
+echo "        name: loki-gateway-ca-bundle"
 echo "        certFile: service-ca.crt"
 echo ""
 echo "To delete all created Kube resources, run:"
@@ -60,3 +55,9 @@ echo ""
 echo "To delete the S3 bucket, run:"
 echo "aws s3 rm s3://$S3_NAME --recursive"
 echo "aws s3 rb s3://$S3_NAME"
+
+
+echo ""
+echo "⏳ Waiting for LokiStack to be ready..."
+
+kubectl wait --timeout=180s --for=condition=ready lokistack loki -n $NAMESPACE
