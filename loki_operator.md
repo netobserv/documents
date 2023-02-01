@@ -88,7 +88,7 @@ Then you will be able to set the following configuration in `FlowCollector` for 
     url: 'https://loki-gateway-http.netobserv.svc:8080/api/logs/v1/network/'
     statusUrl: 'https://loki-query-frontend-http.netobserv.svc:3100'
     tenantID: network
-    authToken: HOST
+    authToken: FORWARD
     tls:
       enable: true
       caCert:
