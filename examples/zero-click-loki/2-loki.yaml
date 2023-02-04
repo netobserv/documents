@@ -25,6 +25,9 @@ data:
           store: inmemory
     compactor:
       compaction_interval: 5m
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150      
     frontend:
       compress_responses: true
     ingester:
