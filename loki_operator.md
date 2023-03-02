@@ -97,6 +97,12 @@ Then you will be able to set the following configuration in `FlowCollector` for 
         certFile: service-ca.crt
 ```
 
+### FORWARD mode (user token based)
+
+Alternatively you can set `authToken` to `FORWARD` instead of `HOST`, which will make NetObserv to pass the logged-in user token to Loki instead of its own one. This allows more fine-grained control on who has access to the data, whereas `HOST` allows any cluster admin.
+
+You then need to define `ClusterRoleBindings` for allowed users or groups, such as [this one](./examples/loki-stack/rolebinding-user.yaml) for a user named `test`.
+
 ## Troubleshooting
 
 - Logs are by default `--log.level=warn`. 

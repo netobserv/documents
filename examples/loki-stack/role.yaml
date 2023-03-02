@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: loki-netobserv-tenant
+  name: netobserv-reader
 rules:
 - apiGroups:
   - 'loki.grafana.com'
@@ -12,20 +12,43 @@ rules:
   - logs
   verbs:
   - 'get'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: netobserv-writer
+rules:
+- apiGroups:
+  - 'loki.grafana.com'
+  resources:
+  - network
+  resourceNames:
+  - logs
+  verbs:
   - 'create'
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: loki-netobserv-tenant
+  name: netobserv-writer-flp
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: loki-netobserv-tenant
+  name: netobserv-writer
 subjects:
 - kind: ServiceAccount
   name: flowlogs-pipeline
   namespace: netobserv
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: netobserv-reader-plugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: netobserv-reader
+subjects:
 - kind: ServiceAccount
   name: netobserv-plugin
   namespace: netobserv
