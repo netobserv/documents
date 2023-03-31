@@ -4,8 +4,7 @@ metadata:
   name: kafka-cluster
 spec:
   kafka:
-    version: 3.2.0
-    replicas: 1
+    replicas: 3
     listeners:
       - name: tls
         port: 9092
@@ -26,6 +25,18 @@ spec:
       default.replication.factor: 1
       min.insync.replicas: 1
       inter.broker.protocol.version: "3.2"
+      auto.create.topics.enable: false
+      log.cleaner.backoff.ms: 15000
+      log.cleaner.dedupe.buffer.size: 134217728
+      log.cleaner.enable: true
+      log.cleaner.io.buffer.load.factor: 0.9
+      log.cleaner.threads: 8
+      log.cleanup.policy: delete
+      log.retention.bytes: 107374182400
+      log.retention.check.interval.ms: 300000
+      log.retention.ms: 1680000
+      log.roll.ms: 7200000
+      log.segment.bytes: 1073741824
     storage:
       type: persistent-claim
       size: 200Gi
