@@ -24,20 +24,20 @@ When you enter a website's domain name (e.g., www.example.com) in your
 browser, your computer needs to find the corresponding IP address.
 This process involves multiple steps, including querying DNS servers,
 caching responses, obtaining the IP address to establish a connection
-and caching response for future re-occurrence of same DNS query.
+and caching response for future re-occurrence of the same DNS query.
 
 ## Utilizing Tracepoint Hooks for DNS Tracking
 
 Tracepoint hooks are predefined points in the Linux kernel where eBPF
 programs can be attached to capture and analyze specific events.
 For DNS tracking, we leveraged tracepoint hooks associated with DNS
-resolution processes specifically `tracepoint/net/net_dev_queue` tracepoint,
-Then we parse the DNS header to determine if its query or response, attempt
-to correlate query and response for specific DNS transaction and then record the
+resolution processes, specifically the `tracepoint/net/net_dev_queue` tracepoint.
+Then we parse the DNS header to determine if it is a query or a response, attempt
+to correlate the query or response for specific DNS transaction, and then record the
 elapsed time to compute DNS latency. Further, DNS network flows are enriched
 to include fields, viz. DNS Id, DNS latency and DNS response codes to help
 build graphs with aggregated DNS statistics and to help filtering on specific
-fields in Network Observability console.
+fields in the Network Observability console.
 
 ## Potential Use Cases
 
@@ -105,7 +105,7 @@ unauthorized resolutions.
 
 ### Overview
 
-New graphs will be introduced in the `advanced options` -> `manage panels` popup:
+New graphs are introduced in the `advanced options` -> `manage panels` popup:
 
 ![advanced options 1](./images/advanced_options1.png)
 
@@ -118,12 +118,12 @@ New graphs will be introduced in the `advanced options` -> `manage panels` popup
 
 ### Traffic flows
 
-The table view will get the new DNS columns `Id`, `Latency` and
-`Response code` available from the `advanced options` -> `manage columns` popup
+The table view adds the new DNS columns `Id`, `Latency` and
+`Response code`, which are available from the `advanced options` -> `manage columns` popup.
 
 ![advanced options 2](./images/advanced_options2.png)
 
-The DNS flows will show these informations in both table and side panel:
+The DNS flows display this information in both the table and the side panel:
 
 ![dns table](./images/dns_table.png)
 
@@ -133,4 +133,4 @@ The DNS flows will show these informations in both table and side panel:
 
 - Adding support for DNS over TCP
 
-- Investigate options to handle DNS over TLS where the DNS header is fully encrypted.
+- Investigating options to handle DNS over TLS where the DNS header is fully encrypted.
