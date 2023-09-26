@@ -209,7 +209,9 @@ Here we go!
 
 ### OK, so what's in the consumer app, really?
 
-It's pretty simple, and you don't need to be an expert in Go to read that code, so you can easily adapt it to your needs:
+It's pretty simple, and you don't need to be an expert in Go to read that code, so you can easily adapt it to your needs.
+
+> NOTE: all the code snippets below are taken from [this repository](https://github.com/jotak/kafka-clickhouse-example/).
 
 It reads messages from Kafka:
 
@@ -274,5 +276,7 @@ What are our next steps regarding storage? To be honest, nothing yet acted in th
 Some ideas: we could improve the storage-less experience by still enabling our Console plugin, with the same dashboards, flow table, topology as with Loki - the only difference being that it would be limited in terms of querying past data, only live flows would be accessible. That would probably involve using Kafka as a flows forwarder.
 
 We could also investigate other storage options. But as you can imagine, maintaining several options in parallel comes at a cost. Especially as the query languages are far from being standardized in the observability landscape. Well... at least at the moment: we keep an eye [on this initiative](https://docs.google.com/document/d/1JRQ4hoLtvWl6NqBu_RN8T7tFaFY5jkzdzsB9H-V370A/edit) which could be a game changer for us.
+
+Finally, if you feel inspired by this flow consumer app, but you would expect something directly usable out of the box, production-ready... well, why not collaborating in the open? We would love to see open-source contributions on this field. We could for instance create new repositories for community-maintained "connectors", hosted on NetObserv's GitHub, and would of course provide all the help and expertise that we can, if there is demand for that.
 
 Any other idea, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/network-observability-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/network-observability-operator/discussions/438).
