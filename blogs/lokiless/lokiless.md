@@ -13,9 +13,9 @@ We also talked with other OpenShift teams having similar requirements, such as t
 To be clear, **we aren't actually moving away from Loki**. Loki remains the one and only storage solution that we fully support at the moment, and our Console plugin is entirely based on queries to Loki, in its _logql_ format. However, we have seen some people using NetObserv in a way that we didn't expect: deploying it without Loki, and configuring flows exporters for instance with Kafka or IPFIX. Why? It turned out they were more interested in the kube-enriched raw flow data than in the visualizations that NetObserv provides, and they didn't want to deal with a new backend storage setup and maintenance. Which, admittedly, is a quite reasonable argument.
 
 To summarize, here's the deal:
-- :moneybag:: you save on operational aspects by not deploying Loki or any storage that would be new to you.
-- :broken_heart:: you loose all the fancy dashboards that we build with so much love.
-- :woman_factory_worker:: you need to create your own Kafka consumer for doing anything with the exported flows: this is on your plate.
+- 💰: you save on operational aspects by not deploying Loki or any storage that would be new to you.
+- 💔: you loose all the fancy dashboards that we build with so much love.
+- 👩🏽‍🔧: you need to create your own Kafka consumer for doing anything with the exported flows: this is on your plate.
 
 ## What is changed
 
