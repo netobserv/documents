@@ -151,7 +151,7 @@ To deploy it:
 kubectl apply -f https://raw.githubusercontent.com/jotak/kafka-clickhouse-example/main/contrib/deployment.yaml -n netobserv
 ```
 
-Now, as everything works as expected (everything always works as expected), you will start getting the precious data in your database.
+Now, as everything works as expected (everything always works as expected), you will start getting the precious records in your database.
 
 ### Check ClickHouse content
 
