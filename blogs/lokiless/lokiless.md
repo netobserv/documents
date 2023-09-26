@@ -275,4 +275,4 @@ Some ideas: we could improve the storage-less experience by still enabling our C
 
 We could also investigate other storage options. But as you can imagine, maintaining several options in parallel comes at a cost. Especially as the query languages are far from being standardized in the observability landscape. Well... at least at the moment: we keep an eye [on this initiative](https://docs.google.com/document/d/1JRQ4hoLtvWl6NqBu_RN8T7tFaFY5jkzdzsB9H-V370A/edit) which could be a game changer for us.
 
-Any other idea, or something to say? Don't hesitate to comment or ask questions on our discussion channel!
+Any other idea, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/network-observability-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/network-observability-operator/discussions/438).
