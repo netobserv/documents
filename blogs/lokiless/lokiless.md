@@ -1,25 +1,25 @@
-# Deploying Network Observability without Loki
+# Deploying Network Observability without Loki: an example with ClickHouse
 
 This blog post talks about a new feature that comes with Network Observability (NetObserv) 1.4: the ability to deploy it without Loki, coupled with exporting flows to an alternative storage. We will try to explain what this new feature means to you, users, and to us, NetObserv developers.
 
 ## A brief history
 
-When we started the NetObserv project, one of the first architectural question was, as you could expect, which storage solution to adopt. It has to be robust for write-intensive application, with indexing capabilities on large data sets, scalable, while still allowing to run complex queries. It must be able to store structured logs and to extract time-series from them. Features like full-text indexing or data mutability aren't required. On top of that, the license must be compatible with our needs. We ended up with a shortlist that included Grafana Loki, OpenDistro, Influx and a few others. This was two years ago.
+When we started the NetObserv project, one of the first architectural questions was, as you could expect, which storage solution to adopt. It has to be robust for a write-intensive application, with indexing capabilities on large data sets, scalable, while still allowing to run complex queries. It must be able to store structured logs and to extract time-series from them. Features like full-text indexing or data mutability aren't required. On top of that, the license must be compatible with our needs. We ended up with a shortlist that included Grafana Loki, OpenDistro, Influx and a few others. This was two years ago.
 
 We also talked with other OpenShift teams having similar requirements, such as the Logging and the Distributed Tracing teams, and got some feedback to eventually rule out candidates with supposedly higher operational costs. And since the Logging team had already planned to invest in the Loki Operator, that was a nice opportunity to mutualize some efforts. Ok, let's be honest: that was a huge time saver especially for us, thanks so much folks!
 
-## Why changing now?
+## Why change now?
 
-To be clear, **we aren't actually moving away from Loki**. Loki remains the one and only storage solution that we fully support at the moment, and our Console plugin is entirely based on queries to Loki, in its _logql_ format. However, we have seen some people using NetObserv in a way that we didn't expect: deploying it without Loki, and configuring flows exporters for instance with Kafka or IPFIX. Why? It turned out they were more interested in the kube-enriched raw flow data than in the visualizations that NetObserv provides, and they didn't want to deal with a new backend storage setup and maintenance. Which, admittedly, is a quite reasonable argument.
+To be clear, **we aren't actually moving away from Loki**. Loki remains the one and only storage solution that we fully support at the moment, and our Console plugin is entirely based on queries to Loki, in its _logql_ format. However, we have seen some people using NetObserv in a way that we didn't expect: deploying it without Loki, and configuring flow exporters for instance with Kafka or IPFIX. Why? It turned out they were more interested in the kube-enriched raw flow data than in the visualizations that NetObserv provides, and they didn't want to deal with a new backend storage setup and maintenance. Which, admittedly, is a quite reasonable argument.
 
 To summarize, here's the deal:
 - 💰: you save on operational aspects by not deploying Loki or any storage that would be new to you.
-- 💔: you loose all the fancy dashboards that we build with so much love.
-- 👩🏽‍🔧: you need to create your own Kafka consumer for doing anything with the exported flows: this is on your plate.
+- 💔: you lose all the fancy dashboards that we build with so much love.
+- 👩🏽‍🔧: you need to create your own consumer — Kafka or IPFIX — for doing anything with the exported flows: this is on your plate. But you will see below that it's nothing insurmountable.
 
 ## What is changed
 
-Before 1.4, there was still a problem: NetObserv was designed with Loki as a requirement. If you don't configure the Loki endpoint, our _flowlogs-pipeline_ component still tries to send flows to a default URL (and fail), and our Console plugin still tries to query Loki (and fail). While the latter isn't too annoying for someone who anyway doesn't want to use the Console plugin, the former could be the cause of performance degradation.
+Before 1.4, there was still a problem: NetObserv was designed with Loki as a requirement. If you don't configure the Loki endpoint, our _flowlogs-pipeline_ component still tries to send flows to a default URL (and fails), and our Console plugin still tries to query Loki (and fails). While the latter isn't too annoying for someone who anyway doesn't want to use the Console plugin, the former could be the cause of performance degradation.
 
 So this is what we did: **we "just" added an _enable_ knob for Loki**. With Loki turned off, _flowlogs-pipeline_ obviously doesn't try to send anything to it. And since the Console plugin becomes useless without Loki, it isn't deployed anymore in that case.
 
@@ -29,11 +29,11 @@ _NetObserv architecture diagram: before and after 1.4_
 As the diagram shows, if we choose to remove Loki, what remains of the flows pipeline downstream is:
 
 - The ability to generate Prometheus metrics. Those metrics and their related dashboards are still accessible in the OpenShift Console, independently from our plugin.
-- The ability to setup one or several exporters downstream the pipeline, such as via Kafka or to any IPFIX collector. This is then up to you to consume this data for any purpose.
+- The ability to set up one or several exporters downstream the pipeline, such as via Kafka or to any IPFIX collector. This is then up to you to consume this data for any purpose.
 
 ## Example use case
 
-Enough theory, let's put it into practice: we are going to setup NetObserv to export enriched flows to Kafka, and we will create a very simple consumer that stores them in a [ClickHouse database](https://clickhouse.com/). To do so, we created a sample application: [kafka-clickhouse-example](https://github.com/jotak/kafka-clickhouse-example/).
+Enough theory, let's put it into practice: we are going to set up NetObserv to export enriched flows to Kafka, and we will create a very simple consumer that stores them in a [ClickHouse database](https://clickhouse.com/). To do so, we created a sample application: [kafka-clickhouse-example](https://github.com/jotak/kafka-clickhouse-example/).
 
 For simplicity, ClickHouse is deployed locally and [ktunnel](https://github.com/omrikiei/ktunnel) is used for reverse port-forwarding, magically bringing ClickHouse "into" the cluster. Obviously, you won't need `ktunnel` when using a real ClickHouse server.
 
@@ -43,9 +43,9 @@ For simplicity, ClickHouse is deployed locally and [ktunnel](https://github.com/
 - [NetObserv operator](https://github.com/netobserv/network-observability-operator) installed (do not install a `FlowCollector` yet).
 - ClickHouse binary: grab it as explained in their [quick install guide](https://clickhouse.com/docs/en/install#quick-install).
 - [ktunnel](https://github.com/omrikiei/ktunnel) binary.
-- Some common tooling such as `curl`, `kubectl`, `envsubst`...
+- Some common tools such as `curl`, `kubectl`, `envsubst`...
 
-> NOTE: These steps have been tested on a small OCP 4.13 cluster with 3 worker nodes. There is no one-size-fits-all configuration, so you might need to adapt some settings depending on your environement, such as [the Kafka configuration](https://github.com/jotak/kafka-clickhouse-example/blob/main/contrib/kafka.yaml).
+> Note: These steps have been tested on a small OCP 4.13 cluster with 3 worker nodes. There is no one-size-fits-all configuration, so you might need to adapt some settings depending on your environment, such as [the Kafka configuration](https://github.com/jotak/kafka-clickhouse-example/blob/main/contrib/kafka.yaml).
 
 ### Start ClickHouse with ktunnel
 
@@ -81,7 +81,7 @@ It creates a `clickhouse` service in the `default` namespace, bridged to your lo
 
 ### Prepare Kafka
 
-The steps here are very similar to the [Kafka deployment script](https://github.com/netobserv/network-observability-operator/blob/release-1.4/.mk/development.mk#L54-L63) that we use in NetObserv for development and testing purposes. They use [Strimzi](https://strimzi.io/) - the upstream of AMQ Streams for OpenShift - to get Kafka in cluster, and a topic named "flows-export" is pre-created. 
+The steps here are very similar to the [Kafka deployment script](https://github.com/netobserv/network-observability-operator/blob/release-1.4/.mk/development.mk#L54-L63) that we use in NetObserv for development and testing purposes. They use [Strimzi](https://strimzi.io/) - the upstream of AMQ Streams for OpenShift - to get Kafka in the cluster, and a topic named "flows-export" is pre-created. 
 
 ```bash
 # Create a namespace for all the deployments
@@ -115,7 +115,7 @@ strimzi-cluster-operator-6bdcd796f6-qsc4g        1/1     Running   0          17
 
 Assuming you already installed the operator, now you must create a `FlowCollector` resource that will start sending flow logs to Kafka. For the purpose of this article, we won't install and configure Loki: all we want is to get the flows into Kafka and ClickHouse.
 
-Note that we configure here Kafka as an **exporter**, which is unrelated to the `spec.deploymentModel: KAFKA` / `spec.kafka` settings: those ones correspond to NetObserv's internal flows processing configuration (NetObserv being both the producer and the consumer), whereas `spec.exporters` relates to NetObserv being just the producer, leaving up to us how we want to consume that data.
+> Note: we configure here Kafka as an **exporter**, which is unrelated to the `spec.deploymentModel: KAFKA` / `spec.kafka` settings: those ones correspond to NetObserv's internal flows processing configuration (NetObserv being both the producer and the consumer), whereas `spec.exporters` relates to NetObserv being just the producer, leaving up to us how we want to consume that data.
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -155,7 +155,7 @@ Now, as everything works as expected (everything always works as expected), you 
 
 ### Check ClickHouse content
 
-Let's make sure the database is being populated. We can use the ClickHouse client in that purpose. From where you downloaded the `clickhouse` binary:
+Let's make sure the database is being populated. We can use the ClickHouse client for that purpose. From where you downloaded the `clickhouse` binary:
 
 ```bash
 ./clickhouse client
@@ -211,12 +211,12 @@ Here we go!
 
 It's pretty simple, and you don't need to be an expert in Go to read that code, so you can easily adapt it to your needs.
 
-> NOTE: all the code snippets below are taken from [this repository](https://github.com/jotak/kafka-clickhouse-example/).
+> Note: all the code snippets below are taken from [this repository](https://github.com/jotak/kafka-clickhouse-example/).
 
 It reads messages from Kafka:
 
 ```
-// ... running in loop ...
+// ... running in a loop ...
 
 		m, err := r.ReadMessage(context.Background())
 		if err != nil {
@@ -273,10 +273,10 @@ We hope that you enjoyed reading this post and that it opens up new horizons abo
 
 What are our next steps regarding storage? To be honest, nothing yet acted in the roadmap at the time of writing, and this is why we'd love to get your feedback.
 
-Some ideas: we could improve the storage-less experience by still enabling our Console plugin, with the same dashboards, flow table, topology as with Loki - the only difference being that it would be limited in terms of querying past data, only live flows would be accessible. That would probably involve using Kafka as a flows forwarder.
+Some ideas: we could improve the storage-less experience by still enabling our Console plugin, with the same dashboards, flow table, topology as with Loki - the only difference being that it would be limited in terms of querying past data, only live flows would be accessible. That would probably involve using Kafka as a flow forwarder.
 
-We could also investigate other storage options. But as you can imagine, maintaining several options in parallel comes at a cost. Especially as the query languages are far from being standardized in the observability landscape. Well... at least at the moment: we keep an eye [on this initiative](https://docs.google.com/document/d/1JRQ4hoLtvWl6NqBu_RN8T7tFaFY5jkzdzsB9H-V370A/edit) which could be a game changer for us.
+We could also investigate other storage options. But as you can imagine, maintaining several options in parallel comes at a cost. Especially as the query languages are far from being standardized in the observability landscape. Well... at least at the moment: we keep an eye on an initiative that could be a game changer for us: [a query standard for observability](https://docs.google.com/document/d/1JRQ4hoLtvWl6NqBu_RN8T7tFaFY5jkzdzsB9H-V370A/edit). Think like OpenTelemetry, but for queries. How nice would it be?
 
-Finally, if you feel inspired by this flow consumer app, but you would expect something directly usable out of the box, production-ready... well, why not collaborating in the open? We would love to see open-source contributions on this field. We could for instance create new repositories for community-maintained "connectors", hosted on NetObserv's GitHub, and would of course provide all the help and expertise that we can, if there is demand for that.
+Finally, if you feel inspired by this flow consumer app, but you would expect something directly usable out of the box, production-ready... Then, why not collaborate in the open? We would love to see open-source contributions on this field. We could for instance create new repositories for community-maintained connectors, hosted on NetObserv's GitHub, and would of course provide all the help and expertise that we can, if there is demand for that.
 
-Any other idea, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/network-observability-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/network-observability-operator/discussions/438).
+Any other ideas, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/network-observability-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/network-observability-operator/discussions/438).
