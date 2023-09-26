@@ -113,7 +113,7 @@ strimzi-cluster-operator-6bdcd796f6-qsc4g        1/1     Running   0          17
 
 ### Prepare NetObserv
 
-Assuming you already installed the operator, now you must create a `FlowCollector` resource that will start sending flow logs to Kafka. For the purpose of this article, we won't install and configure Loki: all we want is to get the flows into Kafka and ClickHouse.
+Assuming you already installed the operator, now you must create a `FlowCollector` resource that will start sending flow logs to Kafka. For the purpose of this article, we won't install and configure Loki but be informed that you can export flows to one or multiple endpoints and save them into Loki in parallel according to your needs.
 
 > Note: we configure here Kafka as an **exporter**, which is unrelated to the `spec.deploymentModel: KAFKA` / `spec.kafka` settings: those ones correspond to NetObserv's internal flows processing configuration (NetObserv being both the producer and the consumer), whereas `spec.exporters` relates to NetObserv being just the producer, leaving up to us how we want to consume that data.
 
