@@ -23,9 +23,10 @@ Before 1.4, there was still a problem: NetObserv was designed with Loki as a req
 
 So this is what we did: **we "just" added an _enable_ knob for Loki**. With Loki turned off, _flowlogs-pipeline_ obviously doesn't try to send anything to it. And since the Console plugin becomes useless without Loki, it isn't deployed anymore in that case.
 
-_TODO: architecture overview diagram with/without loki_
+![Architecture diagram](./images/arch-before-after.gif)
+_NetObserv architecture diagram: before and after 1.4_
 
-As this diagram shows, what remains of the flows pipeline downstream is:
+As the diagram shows, if we choose to remove Loki, what remains of the flows pipeline downstream is:
 
 - The ability to generate Prometheus metrics. Those metrics and their related dashboards are still accessible in the OpenShift Console, independently from our plugin.
 - The ability to setup one or several exporters downstream the pipeline, such as via Kafka or to any IPFIX collector. This is then up to you to consume this data for any purpose.

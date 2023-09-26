@@ -142,3 +142,10 @@ You can decrease them in internal/manifests/internal/sizes.go and set `100m` for
 
 - Certificate errors in Gateway logs
 Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
+
+- Running custom Loki query bypassing the gateway:
+
+```bash
+oc exec -it netobserv-plugin-d894b4544-97tq2 -- curl --cert /var/loki-status-certs-user/tls.crt  --key /var/loki-status-certs-user/tls.key  --cacert /var/loki-status-certs-ca/service-ca.crt -k -H "X-Scope-OrgID: network"  https://loki-query-frontend-http:3100/loki/api/v1/label/DstK8S_Namespace/values
+
+```
