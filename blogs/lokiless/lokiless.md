@@ -1,6 +1,6 @@
 # Deploying Network Observability without Loki: an example with ClickHouse
 
-This blog post talks about a new feature that comes with Network Observability (NetObserv) 1.4: the ability to deploy it without Loki, coupled with exporting flows to an alternative storage. We will try to explain what this new feature means to you, users, and to us, NetObserv developers.
+This blog post talks about a new feature that comes with Network Observability (NetObserv) 1.4: the ability to deploy it without Loki, coupled with exporting flows to an alternative storage. It clarifies what this change is and what it isn't. Then it demonstrates the optional configuration for consuming flows outside of Loki. Finally, it explores potential avenues for future development that this feature enables.
 
 ## A brief history
 
@@ -19,9 +19,9 @@ To summarize, here's the deal:
 
 ## What is changed
 
-Before 1.4, there was still a problem: NetObserv was designed with Loki as a requirement. If you don't configure the Loki endpoint, our _flowlogs-pipeline_ component still tries to send flows to a default URL (and fails), and our Console plugin still tries to query Loki (and fails). While the latter isn't too annoying for someone who anyway doesn't want to use the Console plugin, the former could be the cause of performance degradation.
+Before 1.4, NetObserv was designed with Loki as a requirement. If you did not configure the Loki endpoint, our _flowlogs-pipeline_ component still sent flows to a default URL (and failed), and our console plugin still tried to query Loki (and failed). While the latter isn't too annoying for someone who doesn't intend to use the console plugin, the former could be the cause of performance degradation.
 
-So this is what we did: **we "just" added an _enable_ knob for Loki**. With Loki turned off, _flowlogs-pipeline_ obviously doesn't try to send anything to it. And since the Console plugin becomes useless without Loki, it isn't deployed anymore in that case.
+So this is what we did: **we "just" added an _enable_ knob for Loki**. With Loki turned off, _flowlogs-pipeline_ obviously doesn't try to send anything to it. And since the console plugin becomes useless without Loki, it isn't deployed anymore in that case.
 
 ![Architecture diagram](./images/arch-before-after.gif)
 _NetObserv architecture diagram: before and after 1.4_
