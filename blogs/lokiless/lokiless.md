@@ -10,7 +10,7 @@ We also talked with other OpenShift teams having similar requirements, such as t
 
 ## Why change now?
 
-To be clear, **we aren't actually moving away from Loki**. Loki remains the one and only storage solution that we fully support at the moment, and our Console plugin is entirely based on queries to Loki, in its _logql_ format. However, we have seen some people using NetObserv in a way that we didn't expect: deploying it without Loki, and configuring flow exporters for instance with Kafka or IPFIX. Why? It turned out they were more interested in the kube-enriched raw flow data than in the visualizations that NetObserv provides, and they didn't want to deal with a new backend storage setup and maintenance. Which, admittedly, is a quite reasonable argument.
+To be clear, **we aren't actually moving away from Loki**. Loki remains the one and only storage solution that we fully support at the moment, and our console plugin is entirely based on queries to Loki, in its _logql_ format. However, we have seen some people using NetObserv in a way that we didn't expect: for example, deploying it without Loki and configuring flow exporters with Kafka or IPFIX. Why? It turns out that they are more interested in the kube-enriched raw flow data than in the visualizations that NetObserv provides, and dealing with a new backend storage setup and maintenance is undesirable for them. Which, admittedly, is a quite reasonable argument.
 
 To summarize, here's the deal:
 - 💰: you save on operational aspects by not deploying Loki or any storage that would be new to you.
@@ -26,7 +26,7 @@ So this is what we did: **we "just" added an _enable_ knob for Loki**. With Loki
 ![Architecture diagram](./images/arch-before-after.gif)
 _NetObserv architecture diagram: before and after 1.4_
 
-As the diagram shows, if we choose to remove Loki, what remains of the flows pipeline downstream is:
+As the diagram shows, if we choose to remove Loki, capabilities of the flows pipeline downstream remain:
 
 - The ability to generate Prometheus metrics. Those metrics and their related dashboards are still accessible in the OpenShift Console, independently from our plugin.
 - The ability to set up one or several exporters downstream the pipeline, such as via Kafka or to any IPFIX collector. This is then up to you to consume this data for any purpose.
@@ -55,7 +55,7 @@ Using the ClickHouse binary that you downloaded, run:
 ./clickhouse server
 ```
 
-This will start a ClickHouse server that listens on `:9000` on your machine.
+This starts a ClickHouse server that listens on `:9000` on your machine.
 
 In another terminal, setup ktunnel:
 
@@ -138,12 +138,12 @@ EOF
 
 The Kafka `address` and `topic` configured here match what we deployed in the previous step.
 
-At this point, flows should be generated, collected, enriched and sent to Kafka, but with no consumer on the other end. 
+At this point, flows should be generated, collected, enriched and sent to Kafka but with no consumer on the other end. 
 
 
 ### Run the consumer
 
-Almost all pieces are up and running, now let's bring the missing one: a Kafka consumer that will send flows to ClickHouse. This is [the sample application](https://github.com/jotak/kafka-clickhouse-example/) that we mentioned above.
+Almost all pieces are up and running, now let's bring the missing one: a Kafka consumer that sends flows to ClickHouse. This is [the sample application](https://github.com/jotak/kafka-clickhouse-example/) that we mentioned above.
 
 To deploy it:
 
@@ -151,7 +151,7 @@ To deploy it:
 kubectl apply -f https://raw.githubusercontent.com/jotak/kafka-clickhouse-example/main/contrib/deployment.yaml -n netobserv
 ```
 
-Now, as everything works as expected (everything always works as expected), you will start getting the precious records in your database.
+Now, as everything works as expected (everything always works as expected), the precious records begin flowing into your database.
 
 ### Check ClickHouse content
 
@@ -237,7 +237,7 @@ func decode(b []byte) (map[string]interface{}, error) {
 }
 ```
 
-It get fields from deserialized JSON:
+It gets fields from deserialized JSON:
 
 ```
 	if v, ok := rawFlow[fields.Bytes]; ok {
@@ -265,7 +265,7 @@ That's about it.
 
 It only maps a subset of the available flow data. You can check the [JSON reference](https://docs.openshift.com/container-platform/latest/networking/network_observability/json-flows-format-reference.html) to learn about all the fields.
 
-If you want to adapt it in a secure environment, you will need to configure the [kafka-go client](https://github.com/segmentio/kafka-go#tls-support) for TLS/mTLS/SASL, and the [clickhouse-go client](https://github.com/ClickHouse/clickhouse-go#tlsssl) for TLS and setting up credentials.
+If you want to adapt it in a secure environment, you need to configure the [kafka-go client](https://github.com/segmentio/kafka-go#tls-support) for TLS/mTLS/SASL, and the [clickhouse-go client](https://github.com/ClickHouse/clickhouse-go#tlsssl) for TLS and setting up credentials.
 
 ## What's next?
 
