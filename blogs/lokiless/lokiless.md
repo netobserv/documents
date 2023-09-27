@@ -113,7 +113,7 @@ strimzi-cluster-operator-6bdcd796f6-qsc4g        1/1     Running   0          17
 
 ### Prepare NetObserv
 
-Assuming you already installed the operator, now you must create a `FlowCollector` resource that will start sending flow logs to Kafka. For the purpose of this article, we won't install and configure Loki but be informed that you can export flows to one or multiple endpoints and save them into Loki in parallel according to your needs.
+Assuming you already installed the operator, now you must create a `FlowCollector` resource to start sending flow logs to Kafka. For the purpose of this article, we don't install and configure Loki but be informed that you can export flows to one or multiple endpoints and save them into Loki in parallel according to your needs.
 
 > Note: we configure here Kafka as an **exporter**, which is unrelated to the `spec.deploymentModel: KAFKA` / `spec.kafka` settings: those ones correspond to NetObserv's internal flows processing configuration (NetObserv being both the producer and the consumer), whereas `spec.exporters` relates to NetObserv being just the producer, leaving up to us how we want to consume that data.
 
@@ -273,7 +273,7 @@ We hope that you enjoyed reading this post and that it opens up new horizons abo
 
 What are our next steps regarding storage? To be honest, nothing yet acted in the roadmap at the time of writing, and this is why we'd love to get your feedback.
 
-Some ideas: we could improve the storage-less experience by still enabling our Console plugin, with the same dashboards, flow table, topology as with Loki - the only difference being that it would be limited in terms of querying past data, only live flows would be accessible. That would probably involve using Kafka as a flow forwarder.
+Some ideas: we could improve the storage-less experience by still enabling our console plugin, with the same dashboards, flow table, topology as with Loki - the only difference being that it would be limited in terms of querying past data, only live flows would be accessible. That would probably involve using Kafka as a flow forwarder.
 
 We could also investigate other storage options. But as you can imagine, maintaining several options in parallel comes at a cost. Especially as the query languages are far from being standardized in the observability landscape. Well... at least at the moment: we keep an eye on an initiative that could be a game changer for us: [a query standard for observability](https://docs.google.com/document/d/1JRQ4hoLtvWl6NqBu_RN8T7tFaFY5jkzdzsB9H-V370A/edit). Think like OpenTelemetry, but for queries. How nice would it be?
 
