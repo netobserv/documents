@@ -1,5 +1,7 @@
 # Deploying Network Observability without Loki: an example with ClickHouse
 
+By: Joël Takvorian
+
 This blog post talks about a new feature that comes with Network Observability (NetObserv) 1.4: the ability to deploy it without Loki, coupled with exporting flows to an alternative storage. It clarifies what this change is and what it isn't. Then it demonstrates the optional configuration for consuming flows outside of Loki. Finally, it explores potential avenues for future development that this feature enables.
 
 ## A brief history
