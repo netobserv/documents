@@ -19,9 +19,9 @@ oc replace --force -f config.yaml
 
 The pod will restart automatically.
 
-### Using Zero Click / Distributed Loki
+### Using Zero Click / Microservices Loki
 
-Update [distributed-loki/1-prerequisites/config.yaml](./examples/distributed-loki/1-prerequisites/config.yaml) with your custom configuration.
+Update [loki-microservices/1-prerequisites/config.yaml](./examples/loki-microservices/1-prerequisites/config.yaml) with your custom configuration.
 
 Then replace the config using:
 ```bash

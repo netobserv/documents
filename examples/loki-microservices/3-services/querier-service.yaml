@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: loki-distributed-querier
+  name: loki-microservices-querier
   labels:
     app.kubernetes.io/component: querier
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
     app.kubernetes.io/version: 2.5.0
 spec:
   ipFamilies:
@@ -26,16 +26,16 @@ spec:
   selector:
     app.kubernetes.io/component: querier
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: loki-distributed-querier-headless
+  name: loki-microservices-querier-headless
   labels:
     app.kubernetes.io/component: querier
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
     prometheus.io/service-monitor: 'false'
 spec:
   clusterIP: None
@@ -59,4 +59,4 @@ spec:
   selector:
     app.kubernetes.io/component: querier
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices

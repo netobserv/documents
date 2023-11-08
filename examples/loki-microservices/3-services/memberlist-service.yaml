@@ -1,29 +1,27 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: loki-distributed-distributor
+  name: loki-microservices-memberlist
   labels:
-    app.kubernetes.io/component: distributor
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
     app.kubernetes.io/version: 2.5.0
 spec:
+  clusterIP: None
   ipFamilies:
     - IPv4
   ports:
     - name: http
       protocol: TCP
-      port: 3100
-      targetPort: http
-    - name: grpc
-      protocol: TCP
-      port: 9095
-      targetPort: grpc
+      port: 7946
+      targetPort: http-memberlist
   internalTrafficPolicy: Cluster
+  clusterIPs:
+    - None
   type: ClusterIP
   ipFamilyPolicy: SingleStack
   sessionAffinity: None
   selector:
-    app.kubernetes.io/component: distributor
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
+    app.kubernetes.io/part-of: memberlist

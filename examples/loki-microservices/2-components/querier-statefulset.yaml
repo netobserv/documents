@@ -1,11 +1,11 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: loki-distributed-querier
+  name: loki-microservices-querier
   labels:
     app.kubernetes.io/component: querier
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
     app.kubernetes.io/part-of: memberlist
     app.kubernetes.io/version: 2.5.0
 spec:
@@ -14,18 +14,18 @@ spec:
     matchLabels:
       app.kubernetes.io/component: querier
       app.kubernetes.io/instance: loki
-      app.kubernetes.io/name: loki-distributed
+      app.kubernetes.io/name: loki-microservices
   template:
     metadata:
       creationTimestamp: null
       labels:
         app.kubernetes.io/component: querier
         app.kubernetes.io/instance: loki
-        app.kubernetes.io/name: loki-distributed
+        app.kubernetes.io/name: loki-microservices
         app.kubernetes.io/part-of: memberlist
     spec:
       restartPolicy: Always
-      serviceAccountName: loki-distributed
+      serviceAccountName: loki-microservices
       schedulerName: default-scheduler
       affinity:
         podAntiAffinity:
@@ -34,7 +34,7 @@ spec:
                 matchLabels:
                   app.kubernetes.io/component: querier
                   app.kubernetes.io/instance: loki
-                  app.kubernetes.io/name: loki-distributed
+                  app.kubernetes.io/name: loki-microservices
               topologyKey: kubernetes.io/hostname
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
@@ -43,7 +43,7 @@ spec:
                   matchLabels:
                     app.kubernetes.io/component: querier
                     app.kubernetes.io/instance: loki
-                    app.kubernetes.io/name: loki-distributed
+                    app.kubernetes.io/name: loki-microservices
                 topologyKey: failure-domain.beta.kubernetes.io/zone
       terminationGracePeriodSeconds: 30
       containers:
@@ -92,18 +92,18 @@ spec:
             - name: ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef: 
-                  name: loki-distributed
+                  name: loki-microservices
                   key: ACCESS_KEY_ID
             - name: SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef: 
-                  name: loki-distributed
+                  name: loki-microservices
                   key: SECRET_ACCESS_KEY
-      serviceAccount: loki-distributed
+      serviceAccount: loki-microservices
       volumes:
         - name: config
           configMap:
-            name: loki-distributed
+            name: loki-microservices
             defaultMode: 420
       dnsPolicy: ClusterFirst
   volumeClaimTemplates:
@@ -114,9 +114,9 @@ spec:
         creationTimestamp: null
         labels:
           app.kubernetes.io/component: querier
-          app.kubernetes.io/created-by: loki-distributed-querier
+          app.kubernetes.io/created-by: loki-microservices-querier
           app.kubernetes.io/instance: loki
-          app.kubernetes.io/name: loki-distributed
+          app.kubernetes.io/name: loki-microservices
           app.kubernetes.io/version: 2.5.0
       spec:
         accessModes:
@@ -125,7 +125,7 @@ spec:
           requests:
             storage: 5Gi
         volumeMode: Filesystem
-  serviceName: loki-distributed-querier-headless
+  serviceName: loki-microservices-querier-headless
   podManagementPolicy: Parallel
   updateStrategy:
     type: RollingUpdate

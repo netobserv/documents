@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: loki-distributed-query-frontend
+  name: loki-microservices-query-frontend
   labels:
     app.kubernetes.io/component: query-frontend
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices
     app.kubernetes.io/version: 2.5.0
 spec:
   clusterIP: None
@@ -33,4 +33,4 @@ spec:
   selector:
     app.kubernetes.io/component: query-frontend
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
+    app.kubernetes.io/name: loki-microservices

@@ -1,65 +1,53 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: loki-distributed-distributor
+  name: loki-microservices-query-frontend
   labels:
-    app.kubernetes.io/component: distributor
+    app.kubernetes.io/component: query-frontend
     app.kubernetes.io/instance: loki
-    app.kubernetes.io/name: loki-distributed
-    app.kubernetes.io/part-of: memberlist
+    app.kubernetes.io/name: loki-microservices
     app.kubernetes.io/version: 2.5.0
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app.kubernetes.io/component: distributor
+      app.kubernetes.io/component: query-frontend
       app.kubernetes.io/instance: loki
-      app.kubernetes.io/name: loki-distributed
+      app.kubernetes.io/name: loki-microservices
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app.kubernetes.io/component: distributor
+        app.kubernetes.io/component: query-frontend
         app.kubernetes.io/instance: loki
-        app.kubernetes.io/name: loki-distributed
-        app.kubernetes.io/part-of: memberlist
+        app.kubernetes.io/name: loki-microservices
     spec:
       restartPolicy: Always
-      serviceAccountName: loki-distributed
+      serviceAccountName: loki-microservices
       schedulerName: default-scheduler
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app.kubernetes.io/component: distributor
+                  app.kubernetes.io/component: query-frontend
                   app.kubernetes.io/instance: loki
-                  app.kubernetes.io/name: loki-distributed
+                  app.kubernetes.io/name: loki-microservices
               topologyKey: kubernetes.io/hostname
           preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               podAffinityTerm:
                 labelSelector:
                   matchLabels:
-                    app.kubernetes.io/component: distributor
+                    app.kubernetes.io/component: query-frontend
                     app.kubernetes.io/instance: loki
-                    app.kubernetes.io/name: loki-distributed
+                    app.kubernetes.io/name: loki-microservices
                 topologyKey: failure-domain.beta.kubernetes.io/zone
       terminationGracePeriodSeconds: 30
       containers:
         - resources: {}
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 30
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
           terminationMessagePath: /dev/termination-log
-          name: distributor
+          name: query-frontend
           securityContext:
             capabilities:
               drop:
@@ -73,9 +61,6 @@ spec:
             - name: grpc
               containerPort: 9095
               protocol: TCP
-            - name: http-memberlist
-              containerPort: 7946
-              protocol: TCP
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: config
@@ -85,23 +70,23 @@ spec:
           args:
             - '-config.file=/etc/loki/config/config.yaml'
             - '-config.expand-env=true'
-            - '-target=distributor'
+            - '-target=query-frontend'
           env:
             - name: ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef: 
-                  name: loki-distributed
+                  name: loki-microservices
                   key: ACCESS_KEY_ID
             - name: SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef: 
-                  name: loki-distributed
+                  name: loki-microservices
                   key: SECRET_ACCESS_KEY
-      serviceAccount: loki-distributed
+      serviceAccount: loki-microservices
       volumes:
         - name: config
           configMap:
-            name: loki-distributed
+            name: loki-microservices
             defaultMode: 420
       dnsPolicy: ClusterFirst
   strategy:
