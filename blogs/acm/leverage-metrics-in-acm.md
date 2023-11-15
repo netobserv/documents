@@ -22,7 +22,7 @@ Let's set it up.
 
 - A running cluster, configured as a hub with ACM. (insert doc link)
 - Other clusters imported in ACM.
-- NetObserv operator installed and configured on each cluster to monitor. Only the Red Hat operator can be used here, as ACM will only pull metrics from the OpenShift cluster monitoring operator - it doesn't work with OpenShift "user workload monitoring" mode. (TODO: check another time? / double-check with acm folks).
+- NetObserv operator installed and configured on each cluster to monitor.
 
 #### Configure NetObserv metrics
 
@@ -103,6 +103,8 @@ We could configure it to directly pull the NetObserv metrics, however we choose 
 
 So we are reducing the workload metrics cardinality to `2N` by storing independently `ingress` metrics (per destination, without the source) and `egress` metrics (per source, without the destination).
 
+Note that, if you are using the NetObserv upstream (community) operator, metrics are only available as "user workload metrics", and the procedure to configure ACM observability then differs a little bit: the `ConfigMap` must be deployed in a different namespace, and the file key must be `uwl_metrics_list.yaml`. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html-single/observability/index#adding-user-workload-metrics).
+
 Create this `ConfigMap` in your hub cluster - the one where the ACM operator is installed:
 
 ```bash
@@ -166,7 +168,7 @@ _Top namespaces charts_
 ![Namespaces and Workloads tables](./images/per-cluster-2.png)
 _Namespaces and Workloads tables_
 
-These dashboards provide high level views on cluster metrics. To dive more in the details, such as for troubleshooting or performance analysis, it is still be preferable to use the NetObserv plugin or metrics on a given cluster, via the OpenShift Console: not only the metrics are more accurate there, with less aggregation and a better resolution, but there are also more details available in the raw flow logs that aren't visible in metrics, such as pod/port/IP/interface information per flow and accurate timestamps.
+These dashboards provide high level views on cluster metrics. To dive more in the details, such as for troubleshooting or performance analysis, it is still preferable to use the NetObserv plugin or metrics on a given cluster, via the OpenShift Console: not only the metrics are more accurate there, with less aggregation and a better resolution, but there are also more details available in the raw flow logs that aren't visible in metrics, such as pod/port/IP/interface information per flow and accurate timestamps.
 
 #### It's on you
 
