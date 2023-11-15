@@ -51,7 +51,13 @@ If you have already observability configured in ACM, you can skip this section.
 
 Else, follow the instructions [documented here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/observing-environments-intro#enabling-observability-service).
 
-Proceed until the point where you create a `MultiClusterObservability` resource.
+Proceed until you have created a `MultiClusterObservability` resource.
+
+Before going ahead, makes sure the observability stack is up and running:
+
+```bash
+kubectl get pods -n open-cluster-management-observability -w
+```
 
 #### Configure pulling NetObserv metrics
 
@@ -101,12 +107,14 @@ Create this `ConfigMap` in your hub cluster - the one where the ACM operator is 
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/netobserv-metrics.yaml
+# TODO: remove before merging
+# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/netobserv-metrics.yaml
 ```
 
 This config will be immediately picked up by the metrics collector. To make sure eveything worked correctly, you can take a look at these logs:
 
 ```bash
-kubectl logs -n open-cluster-management-addon-observability -l component=metrics-collector
+kubectl logs -n open-cluster-management-addon-observability -l component=metrics-collector -f
 ```
 
 Hopefully you should see an info log such as: `Metrics pushed successfully`. If there are some typos or mistakes in the ConfigMap, you would see an error in these logs.
@@ -121,8 +129,11 @@ We've built two dashboards for the set of metrics configured:
 To install them:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/netobserv-clusters-overview.yaml
-kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/netobserv-per-cluster.yaml
+kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/clusters-overview.yaml
+kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/per-cluster.yaml
+# TODO: remove before merging
+# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/clusters-overview.yaml
+# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/per-cluster.yaml
 ```
 
 #### Viewing the dashboards
@@ -137,14 +148,25 @@ Click the Grafana link:
 
 The new dashboards are in the "Custom" directory:
 
-- NetObserv Clusters Overview
+![Search dashboards](./images/search-dashboard.png)
 
-(Screenshot)
+1. NetObserv / Clusters Overview
 
-- NetObserv per Cluster
+![Clusters overall](./images/overview-1.png)
+_Clusters overall in/out stats and top namespaces_
 
-(Screenshots)
+![Clusters external](./images/overview-2.png)
+_Clusters in/out external traffic_
 
+2. NetObserv / Per Cluster
+
+![Namespaces charts](./images/per-cluster-1.png)
+_Top namespaces charts_
+
+![Namespaces and Workloads tables](./images/per-cluster-2.png)
+_Namespaces and Workloads tables_
+
+These dashboards provide high level views on clusters metrics. To dive more in the details, such as for troubleshooting or performance analysis, it is still be preferrable to use the NetObserv plugin or metrics on a given cluster, via the OpenShift Console: not only the metrics are more accurate there, with less aggregation and a better resolution, but there are also more details available in the raw flow logs that aren't visible in metrics, such as pod/port/IP/interface information per flow and accurate timestamps.
 
 #### It's on you
 
