@@ -99,7 +99,7 @@ data:
       expr: sum(label_replace(label_replace(label_replace(rate(netobserv_workload_ingress_bytes_total[5m]),\"namespace\",\"$1\",\"DstK8S_Namespace\",\"(.*)\"),\"workload\",\"$1\",\"DstK8S_OwnerName\",\"(.*)\"),\"kind\",\"$1\",\"DstK8S_OwnerType\",\"(.*)\")) by (namespace,workload,kind)
 ```
 
-We could configure it to directly pull the NetObserv metrics, however we choose here another option, using recording rules: it allows to reduce the metrics cardinality by doing some filtering and/or aggregations. Typically, NetObserv metrics have labels for traffic sources and destinations. The cardinality of such metrics grows potentially as `N²`, where `N` is the number of workloads in the cluster. This could be huge with multiple clusters, and we don't need this level of details in multi-cluster wide dashboards.
+We could configure it to directly pull the NetObserv metrics, however we choose here another option, using recording rules: it allows us to reduce the metrics cardinality by doing some filtering and/or aggregations. Typically, NetObserv metrics have labels for traffic sources and destinations. The cardinality of such metrics grows potentially as `N²`, where `N` is the number of workloads in the cluster. This could be huge with multiple clusters, and we don't need this level of details in multi-cluster wide dashboards.
 
 So we are reducing the workload metrics cardinality to `2N` by storing independently `ingress` metrics (per destination, without the source) and `egress` metrics (per source, without the destination).
 
@@ -111,7 +111,7 @@ kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/exam
 # kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/netobserv-metrics.yaml
 ```
 
-This config will be immediately picked up by the metrics collector. To make sure eveything worked correctly, you can take a look at these logs:
+This config will be immediately picked up by the metrics collector. To make sure everything worked correctly, you can take a look at these logs:
 
 ```bash
 kubectl logs -n open-cluster-management-addon-observability -l component=metrics-collector -f
@@ -146,7 +146,7 @@ Click the Grafana link:
 
 ![Grafana](./images/console-acm-grafana.png)
 
-The new dashboards are in the "Custom" directory:
+The new dashboards are in the "NetObserv" directory:
 
 ![Search dashboards](./images/search-dashboard.png)
 
@@ -166,8 +166,23 @@ _Top namespaces charts_
 ![Namespaces and Workloads tables](./images/per-cluster-2.png)
 _Namespaces and Workloads tables_
 
-These dashboards provide high level views on clusters metrics. To dive more in the details, such as for troubleshooting or performance analysis, it is still be preferrable to use the NetObserv plugin or metrics on a given cluster, via the OpenShift Console: not only the metrics are more accurate there, with less aggregation and a better resolution, but there are also more details available in the raw flow logs that aren't visible in metrics, such as pod/port/IP/interface information per flow and accurate timestamps.
+These dashboards provide high level views on cluster metrics. To dive more in the details, such as for troubleshooting or performance analysis, it is still be preferable to use the NetObserv plugin or metrics on a given cluster, via the OpenShift Console: not only the metrics are more accurate there, with less aggregation and a better resolution, but there are also more details available in the raw flow logs that aren't visible in metrics, such as pod/port/IP/interface information per flow and accurate timestamps.
 
 #### It's on you
 
-You can customize these dashboards or create new ones. [This documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/using-grafana-dashboards#setting-up-the-grafana-developer-instance) will guide you through the steps of creating your own dashboards. Don't forget also that [NetObserv has more metrics to show](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md). Just for the mention, we are working on a fresh new API in NetObserv that will soon let you build pretty much any metric you want out of flow logs, for even more dashboarding possibilities.
+You can customize these dashboards or create new ones. [This documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/using-grafana-dashboards#setting-up-the-grafana-developer-instance) will guide you through the steps of creating your own dashboards.
+
+For instance, do you want to track workloads having external traffic, which we haven't done in this article? You can just adapt the rules defined above. If you look at them closely, you'll notice they're all really using the same four metrics under the cover: `netobserv_workload_egress_bytes_total`, `netobserv_workload_ingress_bytes_total` and their equivalent for packets. To track per-workload external traffic, we can use them again, and as for namespaces, filter on empty `SrcK8S_OwnerType` or `DstK8S_OwnerType`. This trick stands for: NetObserv hasn't been able to identify any in-cluster resource corresponding to this source or destination, so this is likely a cluster-external caller or service.
+
+We would end up with these two new rules:
+
+```yaml
+    - record: workload:netobserv_workload_egress_bytes_total:src:unknown_dst:rate5m
+      expr: sum(label_replace(label_replace(label_replace(rate(netobserv_workload_egress_bytes_total{DstK8S_OwnerType=\"\"}[5m]),\"namespace\",\"$1\",\"SrcK8S_Namespace\",\"(.*)\"),\"workload\",\"$1\",\"SrcK8S_OwnerName\",\"(.*)\"),\"kind\",\"$1\",\"SrcK8S_OwnerType\",\"(.*)\")) by (namespace,workload,kind)
+    - record: workload:netobserv_workload_ingress_bytes_total:dst:unknown_src:rate5m
+      expr: sum(label_replace(label_replace(label_replace(rate(netobserv_workload_ingress_bytes_total{SrcK8S_OwnerType=\"\"}[5m]),\"namespace\",\"$1\",\"DstK8S_Namespace\",\"(.*)\"),\"workload\",\"$1\",\"DstK8S_OwnerName\",\"(.*)\"),\"kind\",\"$1\",\"DstK8S_OwnerType\",\"(.*)\")) by (namespace,workload,kind)
+```
+
+Be careful about escaping double-quotes, though it's not very pretty, it is necessary: else you would end up with a parsing error. Also, the `label_replace` chained calls here could be avoided as they look messy, but they make it actually easier to manipulate those metrics later on, in Grafana.
+
+Also, don't forget that [NetObserv has more metrics to show](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md). And just for teasing, we are working on a fresh new API in NetObserv that will soon let you build pretty much any metric you want out of flow logs, for even more dashboarding possibilities.
