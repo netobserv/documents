@@ -1,28 +1,32 @@
-## Leveraging NetObserv metrics in ACM
+## Leveraging NetObserv metrics in RHACM
 
-### What is ACM?
+### What is RHACM?
 
-(short presentation of ACM)
+Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-clusters Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
 
 ### What is NetObserv
 
-(short presentation of NetObserv)
+Network Observability (NetObserv) is a Red Hat operator providing observability over all the network traffic on a cluster by installing eBPF agents per-node which generate flow logs. These flows are collected, stored, converted into metrics, queried from dashboards and so on. More information [here](https://docs.openshift.com/container-platform/4.14/network_observability/network-observability-overview.html).
 
 ### How to combine them?
 
-ACM has an Observability add-on that uses Thanos and Prometheus federation to pull some of the metrics from the monitored clusters, automatically injecting cluster name and ID as metric labels. It provides [an API](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/observing-environments-intro#adding-custom-metrics) to configure which additional metrics to pull.
+RHACM has an Observability add-on that uses Thanos and Prometheus federation to pull some of the metrics from the monitored clusters, automatically injecting cluster name and ID as metric labels. It provides [an API](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/customizing-observability#adding-custom-metrics) to configure which additional metrics to pull.
 
 On the other hand, NetObserv generates metrics out of the processed flow logs. They are pulled and stored by Prometheus, in each cluster where NetObserv is installed.
 
-So it seems there is a match between ACM and NetObserv? Spoiler: yes, there is!
+So it seems there could be a match between RHACM and NetObserv?
 
-Let's set it up.
+(Spoiler: yes!) Let's dive in the details and set it up.
 
 #### Pre-requisites
 
-- A running cluster, configured as a hub with ACM. (insert doc link)
-- Other clusters imported in ACM.
-- NetObserv operator installed and configured on each cluster to monitor.
+- A running OpenShift[*] cluster, configured as a hub with RHACM. The full documentation is [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/install/installing), but for the purpose of this blog I am simply installing the "Advanced Cluster Management for Kubernetes" operator from console Operator Hub, with the default `MultiClusterHub` resource.
+- Other clusters imported in RHACM. To do this, you are well guided when using the OpenShift Console, after selecting "All Clusters" in the top-left dropdown list.
+- NetObserv operator installed and configured on each cluster to monitor. This can also be done entirely from the OpenShift Console, via OperatorHub.
+
+_*: nothing should stop you from doing the same with other Kubernetes flavours, but this blog will focus on OpenShift as it contains a few references to the OpenShift Console, and assumes Prometheus-based monitoring is set up on each cluster like is provided out of the box with OpenShift._
+
+The following instructions have been tested with RHACM 2.8 and 2.9, and NetObserv 1.4.2 and pre-release 1.5.
 
 #### Configure NetObserv metrics
 
@@ -45,18 +49,61 @@ If you're running NetObserv 1.5 or above, edit the `FlowCollector` resource, fin
 
 This adds metrics used in later steps. [Take a look](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md) at the available metrics if you want to customize this setup further.
 
+If you are only interested in metrics, you don't need to install and enable Loki. Read more about that [here](https://cloud.redhat.com/blog/deploying-network-observability-without-loki-an-example-with-clickhouse). But while NetObserv doesn't provide at the moment an out-of-the-box experience for viewing multi-cluster logs from Loki, these flow logs are still the most detailed and accurate data available when it comes to troubleshooting the network per cluster, providing a finer insight than metrics.
+
+Said differently:
+
+- Metrics are the best for zoomed-out, aggregated view: ideal for a multi-cluster single pane of glass.
+- Flow logs are the best for zoomed-in, detailed views: ideal for in-cluster deep dive.
+
 #### Start the observability add-on
 
-If you have already observability configured in ACM, you can skip this section.
+If you have already observability configured in RHACM, you can skip this section.
 
-Else, follow the instructions [documented here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/observing-environments-intro#enabling-observability-service).
+Else, follow the instructions [documented here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/enabling-observability-service). This involves configuring access for metrics storage, such as using AWS S3, Google Cloud Storage, ODF or a few others as you can see in the documentation.
 
 Proceed until you have created a `MultiClusterObservability` resource.
 
-Before going ahead, makes sure the observability stack is up and running:
+Before going further, makes sure the observability stack is up and running:
 
 ```bash
 kubectl get pods -n open-cluster-management-observability -w
+```
+
+Example output:
+```
+NAME                                                       READY   STATUS    RESTARTS      AGE
+observability-alertmanager-0                               3/3     Running   0             91s
+observability-alertmanager-1                               3/3     Running   0             52s
+observability-alertmanager-2                               3/3     Running   0             30s
+observability-grafana-6c9984bd7b-6556s                     3/3     Running   0             92s
+observability-grafana-6c9984bd7b-hd8v6                     3/3     Running   0             92s
+observability-observatorium-api-8598c7f6d-l7psc            1/1     Running   0             75s
+observability-observatorium-api-8598c7f6d-nq888            1/1     Running   0             75s
+observability-observatorium-operator-55674f7fc8-szh7k      1/1     Running   0             92s
+observability-rbac-query-proxy-7b7dd7cb96-mgpwt            2/2     Running   0             91s
+observability-rbac-query-proxy-7b7dd7cb96-w99xg            2/2     Running   0             90s
+observability-thanos-compact-0                             1/1     Running   0             75s
+observability-thanos-query-748f4bb977-7scd6                1/1     Running   0             76s
+observability-thanos-query-748f4bb977-jbwqx                1/1     Running   0             76s
+observability-thanos-query-frontend-5d8b9c878d-btbgm       1/1     Running   0             76s
+observability-thanos-query-frontend-5d8b9c878d-h48mt       1/1     Running   0             75s
+observability-thanos-query-frontend-memcached-0            2/2     Running   0             76s
+observability-thanos-query-frontend-memcached-1            2/2     Running   0             55s
+observability-thanos-query-frontend-memcached-2            2/2     Running   0             54s
+observability-thanos-receive-controller-85bf46b584-l22wp   1/1     Running   0             75s
+observability-thanos-receive-default-0                     1/1     Running   0             75s
+observability-thanos-receive-default-1                     1/1     Running   0             54s
+observability-thanos-receive-default-2                     1/1     Running   0             41s
+observability-thanos-rule-0                                2/2     Running   0             76s
+observability-thanos-rule-1                                2/2     Running   0             46s
+observability-thanos-rule-2                                2/2     Running   0             24s
+observability-thanos-store-memcached-0                     2/2     Running   0             75s
+observability-thanos-store-memcached-1                     2/2     Running   0             58s
+observability-thanos-store-memcached-2                     2/2     Running   0             49s
+observability-thanos-store-shard-0-0                       1/1     Running   2 (64s ago)   76s
+observability-thanos-store-shard-1-0                       1/1     Running   2 (63s ago)   76s
+observability-thanos-store-shard-2-0                       1/1     Running   2 (57s ago)   76s
 ```
 
 #### Configure pulling NetObserv metrics
@@ -99,19 +146,34 @@ data:
       expr: sum(label_replace(label_replace(label_replace(rate(netobserv_workload_ingress_bytes_total[5m]),\"namespace\",\"$1\",\"DstK8S_Namespace\",\"(.*)\"),\"workload\",\"$1\",\"DstK8S_OwnerName\",\"(.*)\"),\"kind\",\"$1\",\"DstK8S_OwnerType\",\"(.*)\")) by (namespace,workload,kind)
 ```
 
-We could configure it to directly pull the NetObserv metrics, however we choose here another option, using recording rules: it allows us to reduce the metrics cardinality by doing some filtering and/or aggregations. Typically, NetObserv metrics have labels for traffic sources and destinations. The cardinality of such metrics grows potentially as `N²`, where `N` is the number of workloads in the cluster. This could be huge with multiple clusters, and we don't need this level of details in multi-cluster wide dashboards.
+Let's take a break here: what are we doing?
 
-So we are reducing the workload metrics cardinality to `2N` by storing independently `ingress` metrics (per destination, without the source) and `egress` metrics (per source, without the destination).
+This is defining a bunch of [Prometheus recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/#rule).
 
-Note that, if you are using the NetObserv upstream (community) operator, metrics are only available as "user workload metrics", and the procedure to configure ACM observability then differs a little bit: the `ConfigMap` must be deployed in a different namespace, and the file key must be `uwl_metrics_list.yaml`. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html-single/observability/index#adding-user-workload-metrics).
+RHACM offers two options for pulling custom metrics from the managed clusters:
 
-Create this `ConfigMap` in your hub cluster - the one where the ACM operator is installed:
+- By declaring metric names to pull
+- Or by declaring such recording rules
+
+The former is easier to configure but in many cases, this is probably not what you want. When pulling metrics from many sources, the key concept to have in mind is [metrics cardinality](https://www.robustperception.io/cardinality-is-key/). The more metrics you configure, the bigger is the impact on Prometheus and Thanos resource usage and performance. "Cardinality" here does not refer to the number of record rules or names that we declare in this configuration - these are called _metric families_ - after all, if you look closely, we only mention four distinct metric families in this config, which isn't a lot. No, what really matters with cardinality is the distinct count of all metric families _and all their combinations of label keys and values_.
+
+Imagine a metric that provides per-pod information: this is a high cardinality. Imagine a metric that provides per-source pod and per-destination pod information: cardinality explodes. Imagine all of that, pulled from hundreds, thousands of clusters: I prefer not to.
+
+Thanksfully, in each cluster, NetObserv's metrics aren't per-pod, but per-workload. This is a first degree of aggregation to tackle cardinality. So the cardinality of such metrics grows capped as `N²`, where `N` is the number of workloads in the cluster. For multi-cluster metrics, this is probably still too much, so we filter or aggregate further using recording rules. Also, multi-cluster dashboards don't have to go ultra deep in the level of details, they need to provide overviews, so we can keep the more detailed metrics just per-cluster, possibly with a smaller retention.
+
+In the config shown above, we are reducing the workload metrics cardinality to `2N` by storing independently `ingress` metrics (per destination, without the source) and `egress` metrics (per source, without the destination). We are also creating other metrics more aggregated, per namespace. And finally, there is a set of metrics with special filters dedicated to watching traffic in/out of the cluster.
+
+End of the break, let's continue with our setup.
+
+Create this `ConfigMap` in your hub cluster - the one where the RHACM operator is installed:
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/netobserv-metrics.yaml
 # TODO: remove before merging
-# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/netobserv-metrics.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/netobserv-metrics.yaml
 ```
+
+Note that, if you are using the NetObserv upstream (community) operator, metrics are only available as "user workload metrics", and the procedure to configure RHACM observability then differs a little bit: the `ConfigMap` must be deployed in a different namespace, and the file key must be `uwl_metrics_list.yaml`. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/customizing-observability#adding-user-workload-metrics).
 
 This config will be immediately picked up by the metrics collector. To make sure everything worked correctly, you can take a look at these logs:
 
@@ -134,8 +196,8 @@ To install them:
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/clusters-overview.yaml
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/per-cluster.yaml
 # TODO: remove before merging
-# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/clusters-overview.yaml
-# kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/per-cluster.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/clusters-overview.yaml
+kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/per-cluster.yaml
 ```
 
 #### Viewing the dashboards
@@ -172,9 +234,9 @@ These dashboards provide high level views on cluster metrics. To dive more in th
 
 #### It's on you
 
-You can customize these dashboards or create new ones. [This documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/observability/using-grafana-dashboards#setting-up-the-grafana-developer-instance) will guide you through the steps of creating your own dashboards.
+You can customize these dashboards or create new ones. [This documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/using-observability#setting-up-the-grafana-developer-instance) will guide you through the steps of creating your own dashboards.
 
-For instance, do you want to track workloads having external traffic, which we haven't done in this article? You can just adapt the rules defined above. If you look at them closely, you'll notice they're all really using the same four metrics under the cover: `netobserv_workload_egress_bytes_total`, `netobserv_workload_ingress_bytes_total` and their equivalent for packets. To track per-workload external traffic, we can use them again, and as for namespaces, filter on empty `SrcK8S_OwnerType` or `DstK8S_OwnerType`. This trick stands for: NetObserv hasn't been able to identify any in-cluster resource corresponding to this source or destination, so this is likely a cluster-external caller or service.
+For instance, do you want to track workloads having external traffic, which we haven't done in this article (we did only for namespaces)? You can just adapt the rules defined above. If you look at them closely, you'll notice they're all really using the same four metrics under the cover: `netobserv_workload_egress_bytes_total`, `netobserv_workload_ingress_bytes_total` and their equivalent for packets. To track per-workload external traffic, we can use them again, and as for namespaces, filter on empty `SrcK8S_OwnerType` or `DstK8S_OwnerType`. This trick stands for: NetObserv hasn't been able to identify any in-cluster resource corresponding to this source or destination, so this is likely a cluster-external caller or service.
 
 We would end up with these two new rules:
 
@@ -188,3 +250,5 @@ We would end up with these two new rules:
 Be careful about escaping double-quotes, though it's not very pretty, it is necessary: else you would end up with a parsing error. Also, the `label_replace` chained calls here could be avoided as they look messy, but they make it actually easier to manipulate those metrics later on, in Grafana.
 
 Also, don't forget that [NetObserv has more metrics to show](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md). And just for teasing, we are working on a fresh new API in NetObserv that will soon let you build pretty much any metric you want out of flow logs, for even more dashboarding possibilities.
+
+If you want to get in touch with the NetObserv team, you can use our [discussion board](https://github.com/netobserv/network-observability-operator/discussions).
