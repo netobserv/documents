@@ -1,5 +1,10 @@
 ## Leveraging NetObserv metrics in RHACM
 
+_By: Joël Takvorian_
+
+_Credits: TODO_
+
+
 ### What is RHACM?
 
 Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-clusters Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
@@ -159,7 +164,7 @@ The former is easier to configure but in many cases, this is probably not what y
 
 Imagine a metric that provides per-pod information: this is a high cardinality. Imagine a metric that provides per-source pod and per-destination pod information: cardinality explodes. Imagine all of that, pulled from hundreds, thousands of clusters: I prefer not to.
 
-Thanksfully, in each cluster, NetObserv's metrics aren't per-pod, but per-workload. This is a first degree of aggregation to tackle cardinality. So the cardinality of such metrics grows capped as `N²`, where `N` is the number of workloads in the cluster. For multi-cluster metrics, this is probably still too much, so we filter or aggregate further using recording rules. Also, multi-cluster dashboards don't have to go ultra deep in the level of details, they need to provide overviews, so we can keep the more detailed metrics just per-cluster, possibly with a smaller retention.
+Thankfully, in each cluster, NetObserv's metrics aren't per-pod, but per-workload. This is a first degree of aggregation to tackle cardinality. So the cardinality of such metrics grows capped as `N²`, where `N` is the number of workloads in the cluster. For multi-cluster metrics, this is probably still too much, so we filter or aggregate further using recording rules. Also, multi-cluster dashboards don't have to go ultra deep in the level of details, they need to provide overviews, so we can keep the more detailed metrics just per-cluster, possibly with a smaller retention.
 
 In the config shown above, we are reducing the workload metrics cardinality to `2N` by storing independently `ingress` metrics (per destination, without the source) and `egress` metrics (per source, without the destination). We are also creating other metrics more aggregated, per namespace. And finally, there is a set of metrics with special filters dedicated to watching traffic in/out of the cluster.
 
