@@ -19,5 +19,6 @@ export YOUR_S3_ENDPOINT="s3.${YOUR_S3_REGION}.amazonaws.com"
 
 aws s3api create-bucket --bucket $YOUR_S3_BUCKET  --region $YOUR_S3_REGION --create-bucket-configuration LocationConstraint=$YOUR_S3_REGION
 
-curl -s -L "https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/thanos-secret.yaml" | envsubst | kubectl apply -f -
-# curl -s -L "https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/thanos-secret.yaml" | envsubst | kubectl apply -f -
+# TODO: update on merge
+# curl -s -L "https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/thanos-secret.yaml" | envsubst | kubectl apply -f -
+curl -s -L "https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/thanos-secret.yaml" | envsubst | kubectl apply -f -

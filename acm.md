@@ -8,10 +8,26 @@ Quick guide:
 
 1. Create 2 clusters (or more)
 2. Choose one for being the main one / hub: install ACM operator on it; Create a default MultiClusterHub
-3. In console top bar, select "all cluster" then start procedure to import an existing cluster
+3. In console top bar, select "all cluster" then start procedure to import an existing cluster. You may define labels "netobserv=true" during import.
+
+You have two options, either you use ACM policies to automate the install, or you install manually netobserv or each cluster.
+
+### Option 1: with ACM policies
+
+Note that this doesn't cover Loki installation, so in this mode Loki & Console plugin will be disabled. Of course it is possible to also automate Loki installation, by creating new policy objects. Feel free to contribute!
+
+```bash
+oc apply -f ./examples/ACM/acm-policy-netobserv-1.4.yaml
+oc apply -f ./examples/ACM/acm-policy-flowcollector-v1beta1-noloki.yaml
+oc apply -f ./examples/ACM/acm-bindings.yaml
+```
+
+Then on each cluster you want to include, add the label "netobserv=true" if you haven't already done so. It will enable the policies for it, triggering automated install. You can do it from the console under Infrastructure > Clusters > Edit labels (on each row / kebab menu).
+
+### Option 2: manual install
 
 On each cluster:
-1. Install netobserv downstream (user workload prometheus won't work)
+1. Install netobserv downstream (user workload prometheus won't work the same way)
 2. Create a FlowCollector, with these metrics enabled (`spec.processor.metrics.includeList`) :
 
 ```yaml

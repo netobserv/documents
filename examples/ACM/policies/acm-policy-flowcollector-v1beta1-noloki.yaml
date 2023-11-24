@@ -1,0 +1,38 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: netobserv-flowcollector
+  namespace: default
+spec:
+  disabled: false
+  dependencies:
+    - apiVersion: policy.open-cluster-management.io/v1
+      kind: Policy
+      name: netobserv
+      namespace: default
+      compliance: Compliant
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: netobserv-flowcollector
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: flows.netobserv.io/v1beta1
+                kind: FlowCollector
+                metadata:
+                  name: cluster
+                spec:
+                  processor:
+                    metrics:
+                      ignoreTags:
+                        - nodes-flows
+                        - workloads-flows
+                        - namespaces
+                  loki:
+                    enable: false

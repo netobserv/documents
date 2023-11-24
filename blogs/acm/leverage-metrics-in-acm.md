@@ -7,11 +7,11 @@ _Credits: TODO_
 
 ### What is RHACM?
 
-Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-clusters Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
+Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-clusters Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. More blog posts on RHACM [here](https://cloud.redhat.com/blog/tag/red-hat-advanced-cluster-management), and documentation [there](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
 
-### What is NetObserv
+### What is NetObserv?
 
-Network Observability (NetObserv) is a Red Hat operator providing observability over all the network traffic on a cluster by installing eBPF agents per-node which generate flow logs. These flows are collected, stored, converted into metrics, queried from dashboards and so on. More information [here](https://docs.openshift.com/container-platform/4.14/network_observability/network-observability-overview.html).
+Network Observability (NetObserv) is a Red Hat operator providing observability over all the network traffic on a cluster by installing eBPF agents per-node which generate flow logs. These flows are collected, stored, converted into metrics, queried from dashboards and so on. More observability blog posts [here](https://cloud.redhat.com/blog/tag/observability), and NetObserv documentation [there](https://docs.openshift.com/container-platform/4.14/network_observability/network-observability-overview.html).
 
 ### How to combine them?
 
@@ -27,7 +27,7 @@ So it seems there could be a match between RHACM and NetObserv?
 
 - A running OpenShift[*] cluster, configured as a hub with RHACM. The full documentation is [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/install/installing), but for the purpose of this blog I am simply installing the "Advanced Cluster Management for Kubernetes" operator from console Operator Hub, with the default `MultiClusterHub` resource.
 - Other clusters imported in RHACM. To do this, you are well guided when using the OpenShift Console, after selecting "All Clusters" in the top-left dropdown list.
-- NetObserv operator installed and configured on each cluster to monitor. This can also be done entirely from the OpenShift Console, via OperatorHub.
+- NetObserv operator installed and configured on each cluster to monitor. This can also be done entirely from the OpenShift Console, via OperatorHub, or even better, directly piloted via RHACM policies. We [provide some templates](https://github.com/netobserv/documents/tree/main/examples/ACM/policies) to help you do that. If you choose to use them, install is triggered by adding a label `netobserv=true` on clusters; but be aware that at the time of writing, it does not cover installing Loki, which means you don't get full-featured NetObserv.
 
 _*: nothing should stop you from doing the same with other Kubernetes flavours, but this blog will focus on OpenShift as it contains a few references to the OpenShift Console, and assumes Prometheus-based monitoring is set up on each cluster like is provided out of the box with OpenShift._
 
@@ -58,7 +58,7 @@ If you are only interested in metrics, you don't need to install and enable Loki
 
 Said differently:
 
-- Metrics are the best for zoomed-out, aggregated view: ideal for a multi-cluster single pane of glass.
+- Metrics are the best for wide angle, aggregated view: ideal for a multi-cluster single pane of glass.
 - Flow logs are the best for zoomed-in, detailed views: ideal for in-cluster deep dive.
 
 #### Start the observability add-on
