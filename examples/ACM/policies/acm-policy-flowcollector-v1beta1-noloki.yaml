@@ -2,14 +2,12 @@ apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
   name: netobserv-flowcollector
-  namespace: default
 spec:
   disabled: false
   dependencies:
     - apiVersion: policy.open-cluster-management.io/v1
       kind: Policy
       name: netobserv
-      namespace: default
       compliance: Compliant
   policy-templates:
     - objectDefinition:
