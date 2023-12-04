@@ -21,7 +21,7 @@ On the other hand, NetObserv generates metrics out of the processed flow logs. T
 
 So it seems there could be a match between RHACM and NetObserv?
 
-(Spoiler: yes!) Let's dive in the details and set it up.
+(Spoiler: yes!) Let's dive into the details and set it up.
 
 #### Pre-requisites
 
@@ -29,7 +29,7 @@ So it seems there could be a match between RHACM and NetObserv?
 - Other clusters imported in RHACM. To do this, you are well guided when using the OpenShift Console, after selecting "All Clusters" in the top-left dropdown list.
 - NetObserv operator installed and configured on each cluster to monitor. This can also be done entirely from the OpenShift Console, via OperatorHub, or even better, directly piloted via RHACM policies. We [provide some templates](https://github.com/netobserv/documents/tree/main/examples/ACM/policies) that you can install on the hub cluster. If you choose to use them, NetObserv install is triggered by adding a label `netobserv=true` on clusters; but be aware that at the time of writing, it does not cover installing Loki, which means you don't get full-featured NetObserv.
 
-_*: nothing should stop you from doing the same with other Kubernetes flavours, but this blog will focus on OpenShift as it contains a few references to the OpenShift Console, and assumes Prometheus-based monitoring is set up on each cluster like is provided out of the box with OpenShift._
+_*: nothing should stop you from doing the same with other Kubernetes flavors, but this blog will focus on OpenShift as it contains a few references to the OpenShift Console, and assumes Prometheus-based monitoring is set up on each cluster like is provided out of the box with OpenShift._
 
 The following instructions have been tested with RHACM 2.8 and 2.9, and NetObserv 1.4.2 and pre-release 1.5.
 
