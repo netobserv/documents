@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "$#" -lt 1 || "$1" = "--help" ]]; then
+if [[ "$#" -lt 2 || "$1" = "--help" ]]; then
 	echo "Syntax: $0 S3_NAME AWS_REGION"
 	echo ""
 	echo "Create S3 bucket and the related secret to use with Thanos"
