@@ -69,7 +69,7 @@ Else, follow the instructions [documented here](https://access.redhat.com/docume
 
 Proceed until you have created a `MultiClusterObservability` resource.
 
-Before going further, makes sure the observability stack is up and running:
+Before going further, make sure the observability stack is up and running:
 
 ```bash
 kubectl get pods -n open-cluster-management-observability -w
@@ -160,7 +160,7 @@ RHACM offers two options for pulling custom metrics from the managed clusters:
 - By declaring metric names to pull
 - Or by declaring such recording rules
 
-The former is easier to configure but in many cases, this is probably not what you want. When pulling metrics from many sources, the key concept to have in mind is [metrics cardinality](https://www.robustperception.io/cardinality-is-key/). The more metrics you configure, the bigger is the impact on Prometheus and Thanos resource usage and performance. "Cardinality" here does not refer to the number of record rules or names that we declare in this configuration - these are called _metric families_ - after all, if you look closely, we only mention four distinct metric families in this config, which isn't a lot. No, what really matters with cardinality is the distinct count of all metric families _and all their combinations of label keys and values_.
+The former is easier to configure but in many cases, this is probably not what you want. When pulling metrics from many sources, the key concept to have in mind is [metrics cardinality](https://www.robustperception.io/cardinality-is-key/). The more metrics you configure, the bigger the impact on Prometheus and Thanos resource usage and performance. "Cardinality" here does not refer to the number of record rules or names that we declare in this configuration - these are called _metric families_ - after all, if you look closely, we only mention four distinct metric families in this config, which isn't a lot. No, what really matters with cardinality is the distinct count of all metric families _and all their combinations of label keys and values_.
 
 Imagine a metric that provides per-pod information: this is a high cardinality. Imagine a metric that provides per-source pod and per-destination pod information: cardinality explodes. Imagine all of that, pulled from hundreds, thousands of clusters: I prefer not to.
 
