@@ -2,7 +2,7 @@
 
 _By: Joël Takvorian_
 
-_Credits: TODO_
+_Credits: Scott Berens, Sara Thomas, Julien Pinsonneau, Steven Lee, Olivier Cazade: thank you for kindly reviewing_
 
 
 ### What is RHACM?
@@ -174,8 +174,6 @@ Create this `ConfigMap` in your hub cluster - the one where the RHACM operator i
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/netobserv-metrics.yaml
-# TODO: remove before merging
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/netobserv-metrics.yaml
 ```
 
 Note that, if you are using the NetObserv upstream (community) operator, metrics are only available as "user workload metrics", and the procedure to configure RHACM observability then differs a little bit: the `ConfigMap` must be deployed in a different namespace, and the file key must be `uwl_metrics_list.yaml`. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/customizing-observability#adding-user-workload-metrics).
@@ -200,9 +198,6 @@ To install them:
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/clusters-overview.yaml
 kubectl apply -f https://raw.githubusercontent.com/netobserv/documents/main/examples/ACM/dashboards/per-cluster.yaml
-# TODO: remove before merging
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/clusters-overview.yaml
-kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm/examples/ACM/dashboards/per-cluster.yaml
 ```
 
 #### Viewing the dashboards
