@@ -7,7 +7,7 @@ _Credits: TODO_
 
 ### What is RHACM?
 
-Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-clusters Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. More blog posts on RHACM [here](https://cloud.redhat.com/blog/tag/red-hat-advanced-cluster-management), and documentation [there](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
+Red Hat Advanced Cluster Management for Kubernetes (RHACM) provides end-to-end management visibility and control to manage a multi-cluster Kubernetes / OpenShift environment. It can be deployed with an OLM operator and is integrated with the OpenShift Console, with all managed clusters being supervised from a hub cluster console. For more information, see [blog posts](https://cloud.redhat.com/blog/tag/red-hat-advanced-cluster-management) on RHACM , and [documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/about/welcome-to-red-hat-advanced-cluster-management-for-kubernetes).
 
 ### What is NetObserv?
 
@@ -25,7 +25,7 @@ So it seems there could be a match between RHACM and NetObserv?
 
 #### Pre-requisites
 
-- A running OpenShift[*] cluster, configured as a hub with RHACM. The full documentation is [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/install/installing), but for the purpose of this blog I am simply installing the "Advanced Cluster Management for Kubernetes" operator from console Operator Hub, with the default `MultiClusterHub` resource.
+- A running OpenShift[*] cluster, configured as a hub with RHACM. In this blog, I am simply installing the Advanced Cluster Management for Kubernetes operator from console Operator Hub, with the default `MultiClusterHub` resource. For full installation guidance, see the [documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/install/installing).
 - Other clusters imported in RHACM. To do this, you are well guided when using the OpenShift Console, after selecting "All Clusters" in the top-left dropdown list.
 - NetObserv operator installed and configured on each cluster to monitor. This can also be done entirely from the OpenShift Console, via OperatorHub, or even better, directly piloted via RHACM policies. We [provide some templates](https://github.com/netobserv/documents/tree/main/examples/ACM/policies) that you can install on the hub cluster. If you choose to use them, NetObserv install is triggered by adding a label `netobserv=true` on clusters; but be aware that at the time of writing, it does not cover installing Loki, which means you don't get full-featured NetObserv.
 
@@ -35,12 +35,12 @@ The following instructions have been tested with RHACM 2.8 and 2.9, and NetObser
 
 #### Configure NetObserv metrics
 
-By default, NetObserv will configure a small set of metrics, namely:
+By default, NetObserv configures a small set of metrics, namely:
 - `namespace_flows_total`
 - `node_ingress_bytes_total`
 - `workload_ingress_bytes_total`
 
-For the purpose of this article, we will enable more of them. Note that enabling more metrics may have a noticeable impact on Prometheus. You should monitor Prometheus resource usage when doing so.
+For the purpose of this blog, we enable more metrics. Note that enabling more metrics may have a noticeable impact on Prometheus. You should monitor Prometheus resource usage when doing so.
 
 If you're running NetObserv 1.4.x or older, edit the `FlowCollector` resource, find property `spec.processor.metrics.ignoreTags` and remove `egress` and `packets`.
 
@@ -54,16 +54,16 @@ If you're running NetObserv 1.5 or above, edit the `FlowCollector` resource, fin
 
 This adds metrics used in later steps. [Take a look](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md) at the available metrics if you want to customize this setup further.
 
-If you are only interested in metrics, you don't need to install and enable Loki. Read more about that [here](https://cloud.redhat.com/blog/deploying-network-observability-without-loki-an-example-with-clickhouse). But while NetObserv doesn't provide at the moment an out-of-the-box experience for viewing multi-cluster logs from Loki, these flow logs are still the most detailed and accurate data available when it comes to troubleshooting the network per cluster, providing a finer insight than metrics.
+If you are only interested in metrics, you don't need to install and enable Loki. Read more about that [here](https://cloud.redhat.com/blog/deploying-network-observability-without-loki-an-example-with-clickhouse). But while NetObserv doesn't currently provide an out-of-the-box experience for viewing multi-cluster logs from Loki, these flow logs are still the most detailed and accurate data available when it comes to troubleshooting the network per cluster, providing a finer insight than metrics.
 
 Said differently:
 
 - Metrics are the best for wide angle, aggregated view: ideal for a multi-cluster single pane of glass.
-- Flow logs are the best for zoomed-in, detailed views: ideal for in-cluster deep dive.
+- Flow logs are the best for zoomed-in, detailed views: ideal for an in-cluster deep dive.
 
 #### Start the observability add-on
 
-If you have already observability configured in RHACM, you can skip this section.
+If you already have observability configured in RHACM, you can skip this section.
 
 Else, follow the instructions [documented here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/enabling-observability-service). This involves configuring access for metrics storage, such as using AWS S3, Google Cloud Storage, ODF or a few others as you can see in the documentation.
 
@@ -180,7 +180,7 @@ kubectl apply -f https://raw.githubusercontent.com/jotak/netobserv-documents/acm
 
 Note that, if you are using the NetObserv upstream (community) operator, metrics are only available as "user workload metrics", and the procedure to configure RHACM observability then differs a little bit: the `ConfigMap` must be deployed in a different namespace, and the file key must be `uwl_metrics_list.yaml`. More information [here](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/customizing-observability#adding-user-workload-metrics).
 
-This config will be immediately picked up by the metrics collector. To make sure everything worked correctly, you can take a look at these logs:
+This config is immediately picked up by the metrics collector. To make sure everything worked correctly, you can take a look at these logs:
 
 ```bash
 kubectl logs -n open-cluster-management-addon-observability -l component=metrics-collector -f
@@ -241,7 +241,7 @@ These dashboards provide high level views on cluster metrics. To dive more in th
 
 You can customize these dashboards or create new ones. [This documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html/observability/using-observability#setting-up-the-grafana-developer-instance) will guide you through the steps of creating your own dashboards.
 
-For instance, do you want to track workloads having external traffic, which we haven't done in this article (we did only for namespaces)? You can just adapt the rules defined above. If you look at them closely, you'll notice they're all really using the same four metrics under the cover: `netobserv_workload_egress_bytes_total`, `netobserv_workload_ingress_bytes_total` and their equivalent for packets. To track per-workload external traffic, we can use them again, and as for namespaces, filter on empty `SrcK8S_OwnerType` or `DstK8S_OwnerType`. This trick stands for: NetObserv hasn't been able to identify any in-cluster resource corresponding to this source or destination, so this is likely a cluster-external caller or service.
+For instance, do you want to track workloads having external traffic, which we haven't done in this blog (we did only for namespaces)? You can just adapt the rules defined above. If you look at them closely, you'll notice they're all really using the same four metrics under the cover: `netobserv_workload_egress_bytes_total`, `netobserv_workload_ingress_bytes_total` and their equivalent for packets. To track per-workload external traffic, we can use them again, and as for namespaces, filter on empty `SrcK8S_OwnerType` or `DstK8S_OwnerType`. This trick stands for: NetObserv hasn't been able to identify any in-cluster resource corresponding to this source or destination, so this is likely a cluster-external caller or service.
 
 We would end up with these two new rules:
 
