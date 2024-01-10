@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: netobserv-alerts
+spec:
+  groups:
+  - name: NetObservAlerts
+    rules:
+    - alert: NetObservIncomingBandwidth
+      annotations:
+        message: |-
+          {{ $labels.job }}: incoming traffic exceeding 10 MBps for 30s on {{ $labels.DstK8S_OwnerType }} {{ $labels.DstK8S_OwnerName }} ({{ $labels.DstK8S_Namespace }}).
+        summary: "High incoming traffic."
+      expr: sum(rate(netobserv_workload_ingress_bytes_total{SrcK8S_Namespace="openshift-ingress"}[1m])) by (job, DstK8S_Namespace, DstK8S_OwnerName, DstK8S_OwnerType) > 10000000
+      for: 30s
+      labels:
+        severity: warning
