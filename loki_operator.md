@@ -130,5 +130,58 @@ Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
 
 ```bash
 oc exec -it netobserv-plugin-d894b4544-97tq2 -- curl --cert /var/loki-status-certs-user/tls.crt  --key /var/loki-status-certs-user/tls.key  --cacert /var/loki-status-certs-ca/service-ca.crt -k -H "X-Scope-OrgID: network"  https://loki-query-frontend-http:3100/loki/api/v1/label/DstK8S_Namespace/values
-
 ```
+
+### Loki "input size too long" error
+
+This error is generally seen when non cluster-admin users have access to many namespaces. Since the operator gateway will inject namespaces in queries for
+multi-tenancy, this may result in queries being too long, reaching 5120 characters (which sounds actually like a very reasonable limit for non-cluster-admin users), and thus being rejected by Loki.
+
+#### For cluster admins
+
+Users identified as cluster admins should not see this error because there is no namespace-based restriction for them. The Loki operator performs this identification by **checking if users belong to one of the defined cluster-admin groups**.
+
+Note that having the cluster-admin **role** does not imply belonging to the cluster-admin **group**. So you should double-check groups.
+
+With OpenShift, to create a cluster-admin group, run:
+
+```bash
+oc adm groups new cluster-admin
+```
+
+To add a user to cluster-admin group, run:
+
+```bash
+oc adm policy add-cluster-role-to-user cluster-admin <username>
+```
+
+You may also want to give cluster-admin role for all group members rather than one by one:
+
+```bash
+oc adm policy add-cluster-role-to-group cluster-admin cluster-admin
+```
+
+Running these commands should solve the problem. It might be necessary to wait a couple of minutes for changes to be effective.
+
+By default, the Loki operator recognizes three groups as cluster-admins: `system:cluster-admins`, `cluster-admin` and `dedicated-admin`. If you already have a cluster admin group with a different name, you can override this default in the `LokiStack` configuration:
+
+```yaml
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: loki
+  namespace: netobserv
+spec:
+  # ... other settings here ...
+  tenants:
+    mode: openshift-network
+    openshift:
+      adminGroups: 
+      - my-admins-group
+```
+
+#### For non cluster admins
+
+In most cases, non cluster admins shouldn't see this error as the configured input size limit should be long enough. However, it may still occur than users have access to many namespaces despite not being cluster admins. You may create a new group for these users, and configure the `LokiStack` tenant as shown above.
+
+We are also working on an alternative to allow finer-grained RBAC access to NetObserv flows, which would allow to restrict accessible namespaces per user. This is being tracked [here](https://issues.redhat.com/browse/NETOBSERV-1324).
