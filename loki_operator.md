@@ -84,10 +84,16 @@ Once the Loki stack is up and running, you need to configure NetObserv to commun
 
 ### User access
 
-You then need to define `ClusterRoleBindings` for allowed users or groups, such as [this one](./examples/loki-stack/rolebinding-user-test.yaml) for a user named `test`. This can also be done from the CLI:
+You then need to define `ClusterRoleBindings` or `RoleBindings` for allowed users or groups, such as [this one](./examples/loki-stack/rolebinding-user-test.yaml) for a user named `test`. This can also be done from the CLI:
 
 ```bash
 oc adm policy add-cluster-role-to-user netobserv-reader test
+```
+
+Alternatively, you can use fine-grained roles per namespace:
+
+```bash
+oc adm policy add-role-to-user netobserv-reader test -n my-namespace
 ```
 
 Cluster admins do not need this role binding.
