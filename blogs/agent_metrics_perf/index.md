@@ -188,7 +188,7 @@ As expected, more flows mean more CPU. This also impacts the components that are
 
 ### When it all goes wrong
 
-Just for the sake of the demonstration, here's how it looks like with an undersized hashmap leading to over-use of the ring buffer:
+Just for the sake of the demonstration, here's how it looks like with an undersized hashmap leading to over-use of the ring buffer. This is between 12:20 and 12:30 in the charts:
 
 ![Agent stats runaway](./images/agent-stats-runaway.png)
 
