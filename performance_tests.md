@@ -25,4 +25,4 @@ Test results are copied into [this spreadsheet](https://docs.google.com/spreadsh
   - Run any or all of the hey-ho commands listed for LOW, MEDIUM and HIGH, such as `./hey-ho.sh -r 2 -d 2 -z 10m -n 1 -q 50 -p`. Each command is set up for a 10-minutes run. Note that this may generate a lot of stress on the cluster, especially the HIGH one. It's not impossible that you have to restart a lost node.
   - Gather metrics using the promQL queries provided. For convenience there are some links provided at the top to directly open OpenShift console metrics pages.
   - Write data manually, accordingly. (Note: perhaps at some point we will automate this.. but that's also a good thing to actually take a look at the time-series, you might potentially notice interesting things that you wouldn't with a summary computed automatically).
-  - Between runs, restart Loki, Kafka and/or any workload impacted.
+  - Between runs, restart Loki, Kafka and/or any workload impacted. You should also delete hey-ho pods with `./hey-ho.sh -c -n 3`.
