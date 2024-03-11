@@ -74,7 +74,7 @@ But because the maps are polled from the user space, it might happen sometimes, 
 
 The fundamental difference for us, between maps and the ring buffer, is that maps allow to cache data in kernel and perform aggregations of the packets meta-data into the cached flows, whereas the ring buffer transfers data to the user space every time a new flow packet is received. So it involves many more exchanges between kernel and user spaces, and that comes with a computational cost. So when the ring buffer is involved, this is like a degraded situation; but with the intent that it's just temporary and exceptional. When a packet is received in user space from the ring buffer, if the reason was that the map was full, it triggers a map flush event to get things back to normal as soon as possible.
 
-Previously, we didn't have many clues about what was going on under the cover, in the agent data path. We mostly had to turn on profiling and dive into it with `pprof`. Now metrics help us, and users, to get a better insight, and hopefully allow taking more informed decisions about fine-tuning. So let's go back to the metrics.
+Previously, it was difficult to track what's going on under the cover, especially about the agent data path. We mostly had to turn on profiling and deep dive using `pprof`. Now metrics give both developers and users a better insight that allows taking more informed decisions about fine-tuning. So let's go back to the metrics.
 
 ### Back to the dashboard
 
@@ -104,11 +104,11 @@ Keep it as low as possible. The picture here is fine: even the spike is actually
 
 ![Buffer sizes](./images/buffer-sizes.png)
 
-Even if there are five metrics, it shows mostly three things: the deduper cache size, the hashmap size and the accounter cache size. `deduper-map` and `deduper-list` should normally be identical, as well as `hashmap-total` and `hashmap-unique`. They were mostly duplicated for debugging. If you find that they aren't identical, that might be an indication that something isn't going as expected. [Let us know](https://github.com/netobserv/netobserv-ebpf-agent/issues).
+Even if there are five metrics, it shows mostly three things: the deduper cache size, the hashmap size and the accounter cache size. `deduper-map` and `deduper-list` should normally be identical, as well as `hashmap-total` and `hashmap-unique`. They were mostly duplicated for debugging. If you find that they aren't identical, that might be an indication that something isn't going as expected. In that case, feel free to [open a github issue](https://github.com/netobserv/netobserv-ebpf-agent/issues) to discuss.
 
 ## What can we learn already?
 
-The buffer size metrics tell us that the hashmaps are containing between 15K and 25K elements, which is a sum for every eBPF Agent pods. I'm interested to know if my hashmap configuration isn't over-sized. We can click the Inspect link and edit a little bit the promQL to see per-pod utilization:
+The buffer size metrics tell us that the hashmaps are containing between 15K and 25K elements, which is a sum for every eBPF Agent pods. We are interested to know if the hashmap configuration isn't over-sized. We can click the Inspect link and edit a little bit the promQL to see per-pod utilization:
 
 `netobserv_agent_buffer_size{name="hashmap-unique"}` shows per-pod maps size, or `max(netobserv_agent_buffer_size{name="hashmap-unique"})` shows the maximum map utilization across pods.
 
@@ -118,7 +118,7 @@ Sounds like it never goes above 4K.
 
 ## Fine-tuning
 
-Remember my `FlowCollector` settings? I didn't change the `spec.agent.ebpf.cacheMaxFlows` value. This is the setting used to set the map sizes, and it defaults to 100K. So yes, for my usage, perhaps this is over-sized as my maps are generally under 4K.
+Remember the `FlowCollector` settings? We didn't change the `spec.agent.ebpf.cacheMaxFlows` value. This is the setting used to set the map sizes, and it defaults to 100K. So yes, for this usage, perhaps it is over-sized as the maps are generally under 4K.
 
 Let's halve it and see what happens.
 
@@ -148,7 +148,7 @@ While the ring buffer doesn't seem to be more used most of the time, there is a 
 
 Taking a close look at the eviction rate graph, there's a small increase of the hashmap line (purple) at the same time, whereas it used to be a flat 1.2 otherwise. What does it say? It says that for the first time here, the map eviction was not due to the `cacheTimeout` setting (evicting every 5s), but it was due to the map being full.
 
-Note that there is an artifact visible here, a global increase of the flows being generated (~3.5K to ~4K), which I am not sure to explain but could be related to having restarted my test workloads. 10 minutes later it retrieved its previous level, closer to 3K:
+Note that there is an artifact visible here, a global increase of the flows being generated (~3.5K to ~4K), which could be related to a test workloads restart. 10 minutes later it retrieved its previous level, closer to 3K:
 
 ![FPS back to normal](./images/fps-back-normal.png)
 
