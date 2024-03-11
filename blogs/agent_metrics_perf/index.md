@@ -184,7 +184,7 @@ We reached our goal: the ring buffer ratio has dropped. But we see more flows ar
 
 ![Resource usage at 1s cacheTimeout](./images/res-usage-1s.png)
 
-More flows mean more CPU. The impact goes beyond the agent alone, as the components that are downstream the pipeline (flowlogs-pipeline and, if you use them, Kafka and Loki), will also need to process more flows. But while the situation seems less glorious here, this is on purpose: to keep us out of a flows runaway due to over-use of the ring buffer.
+More flows mean more CPU. The impact goes beyond the agent alone, as the components that are downstream the pipeline (flowlogs-pipeline and, if you use them, Kafka and Loki), will also need to process more flows. But while the situation seems less glorious here, this is on purpose: to keep us out of a flows runaway due to over-use of the ring buffer, which we will see next.
 
 ### When it all goes wrong
 
@@ -196,18 +196,22 @@ The ring buffer ratio went above 0.05 with even a huge spike to 0.5. This result
 
 ![Resource usage runaway](./images/res-usage-runaway.png)
 
-This had a big impact on CPU usage, which had more than tripled.
+This had a big impact on CPU usage:
+- +457% CPU when compared to `cacheMaxFlows=10000`
+- +143% CPU when compared to `cacheMaxFlows=2000, cacheTimeout=1s`
+
+To avoid this, it's best to keep `cacheMaxFlows` big enough to minimize the ring buffer ratio usage, in spite of the increased memory usage. Other mitigation options could be limiting the number of generated flows by other means, such as [configuring the agent](https://github.com/netobserv/network-observability-operator/blob/19bcb45d6899f12feb13f94a925a10a4f4c92106/docs/FlowCollector.md#flowcollectorspecagentebpf-1) to add filters on monitored interfaces or to increase the sampling value, if the resulting loss in observability is an acceptable trade-off for you.
 
 ## Conclusion
 
 The key takeaways are:
 
-1, we must ensure to not use under-sized eBPF hashmaps, which is controlled in `FlowCollector` with `spec.agent.ebpf.cacheMaxFlows`, and probably the best way to do this is by monitoring the Ringbuffer / HashMap ratio. It might be a good idea to create a Prometheus alert when the ratio reaches some threshold.
+1. Ensure to not use under-sized eBPF hashmaps, which is controlled in `FlowCollector` with `spec.agent.ebpf.cacheMaxFlows`. The suggested way to do this is by monitoring the Ringbuffer / HashMap ratio. It might be a good idea to create a Prometheus alert when the ratio reaches some threshold such as 0.05.
 
-2, while keeping point 1 in mind, there are potential important improvements to have on the memory footprint, by downsizing the hashmaps when possible. It is however highly recommended to keep a safety margin, because of course, real world traffic isn't flat and the maps must be able to absorb traffic spikes.
+2. While keeping point 1 in mind, there are potentially nice improvements to be made on the memory footprint, by downsizing the hashmaps where possible. It is however highly recommended to keep a safety margin, because of course, real world traffic isn't flat and the maps must be able to absorb traffic increases.
 
-As a last picture, this is how the captured traffic looked like during all these tests (in orange) versus the same from cAdvisor metrics, taken as a reference (in blue):
+To conclude with a last picture, this is how the captured traffic looked during all these tests (in orange) versus the same from cAdvisor metrics taken as a reference (in blue):
 
 ![Hey-ho traffic](./images/heyho-mbps-3.png)
 
-You can see that they perfectly match, meaning that all the tweaks that we did haven't affected the correctness of the data, even during the "flows runaway" at 12:25 where we could have feared some drops.
+You can see that they almost perfectly match. It means that all the tweaks we did haven't affected the correctness of the data, even during the "flows runaway" at 12:25 where we could have feared some drops.
