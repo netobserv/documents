@@ -7,3 +7,13 @@ metadata:
 spec:
   partitions: 24
   replicas: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: informers
+  labels:
+    strimzi.io/cluster: "kafka-cluster"
+spec:
+  partitions: 24
+  replicas: 1
