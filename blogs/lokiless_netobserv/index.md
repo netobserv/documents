@@ -86,6 +86,6 @@ In addition to metrics for `DNSTracking` feature, Network Observability provides
 
 Network Observability operator provides the visibility you need to proactively detect issues with OpenShift cluster networking. Now with an option to disable loki, Network Observability operator provides light weight solution to visualize, diagnose and troubleshoot networking issues faster at a lower cost. Network Observability's prometheus metrics can be leveraged to set up user defined alerts in your OCP cluster.
 
-While some feature parity gaps exists when compared to configuration with Loki enabled, team is actively working to close that gap and enhance this feature by enabling visualization for packet drops and better prometheus muti-tenancy.
+While some feature parity gap exists when compared to configuration with Loki enabled, team is actively working to close that gap and enhance this feature by enabling visualization for packet drops and better Prometheus multi-tenancy.
 
 Whether you have already deployed or considering to deploy it, we'd love to engage with you and hear your thoughts [here](https://github.com/netobserv/network-observability-operator/discussions).
