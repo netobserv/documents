@@ -11,11 +11,12 @@ Loki as datasource is currently enabled by default. To configure Network Observa
 loki:
   enable: false
 ```
+When configured as above, Prometheus metrics will continue to get sent to OpenShift's cluster Prometheus without any additonal configuration on the users end and Network Observability console will use Prometheus as a source for data queries.
 
 ## Performance and Resource utilization gains
 
 ### Query performance:
-<TODO: note faster query performance data when compared to loki here>
+<TODO: note faster query performance data and ability to scan wider time span of data when compared to loki here>
 
 ### Resource utilization:
 In our tests conducted on 3 different test beds with varied workloads and network throughput, when Network Observability is configured without Loki, total savings of Memory usage could be in range 12-60% and CPU utilzation could be lower by 20-30%<sup>*</sup>. Not to mention you will not need to provision and plan for additional storage in public clouds for Loki, overall reducing the cost and improving operational efficiency significantly.
@@ -33,15 +34,26 @@ Below graphs shows total vCPU and memory usage for a recommended Network Observa
 
 <sup>*</sup> actual resource utilization may depend on various factors such as flowcollector sampling size, number of workloads and nodes in an OCP cluster
 
-This comes with couple of trade-offs though, without storage of network flows it no longer provides Traffic flows table. Also, per-pod level of resource granularity is not available since it causes Prometheus metrics to have high cardinality. However, should you need per-pod or per-flow level of granularity for diagnostic and troubleshooting needs, enabling loki should be pretty straightforward and both datasources can be used. When both loki and Prometheus datasources are enabled, while querying on Netflow Traffic page, Prometheus queried data over will be used wherever possible since it offers faster performance.
+## Trade-offs:
+We saw having Prometheus as datasource provides impressive performance gains, however it introduces below constraints:
+1. Without storage of network flows it no longer provides Traffic flows table. <TODO: insert a picture Traffic table greyed out>
 
-## Accessing Netflow Traffic for non-admins:
-While Prometheus currently doesn't supports multi-tenancy in a way that Loki does in an OpenShift cluster, non-admin users can be added to `cluster-monitoring-view`. For example, below command can be used to enable Prometheus metrics visualizing for `testuser-0` user.
+2. Per-pod level of resource granularity is not available since it causes Prometheus metrics to have high cardinality. <TODO: insert a picture where diff between with-Loki and without-Loki Scope>
+   
+   Should you need per-flow or per-pod level of granularity for diagnostic and troubleshooting needs, other than enabling Loki you have multiple other options available:
 
-`oc adm policy add-cluster-role-to-user cluster-monitoring-view  testuser-0`
+   a. Collect flowlogs into your preferred data analytics tool using `.spec.exporters` config in Flowcollector, currently Kafka and IPFIX are supported exporters.
+
+   b. In this release, Network Observability also introduced `FlowMetrics` API which lets you create custom metrics which may not be available out of the box. `FlowMetrics` API creates on-demand Prometheus metrics based on enriched flowlogs fields which can be used as labels for custom Prometheus metrics. _Note: Be careful with this option though, introducing metrics that may have labels with high cardinality increases cluster's Promethes resource usage and may impact overall cluster monitoring_.
+
+3. Restricted multi-tenancy - Currently Prometheus in OpenShift cluster currently doesn't support multi-tenancy in a way that Loki does, non-admin users can be added to `cluster-monitoring-view` where user will have access to view all available Prometheus metrics.
+
+   For example, below command can be used to enable Prometheus metrics visualizing for `testuser-0` user.
+
+   `oc adm policy add-cluster-role-to-user cluster-monitoring-view  testuser-0`
 
 ## Network Observability metrics use case:
-Let's look at a scenario how users can benefit from metrics published by Network Observability Operator. For instance, if you suspect anamaly with DNS lookups in your cluster and want to investigate workloads that may be facing DNS latencies. With Network Observability's `DNSTracking` feature and enriched Prometheus metrics you can quickly set up an alert to trigger on high DNS latencies.
+Let's look at a scenario how users can benefit from metrics published by Network Observability Operator. For instance, if you suspect anomaly with DNS lookups in your cluster and want to investigate workloads that may be facing DNS latencies. With Network Observability's `DNSTracking` feature and enriched Prometheus metrics you can quickly set up an alert to trigger on high DNS latencies.
 
 For example, below alert will trigger for any workloads that experiences DNS latency > 100ms: 
 ```yaml
@@ -49,6 +61,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: dns-latency-alert
+  namespace: netobserv
 spec:
   groups:
   - name: DNSLatencyAlert
@@ -58,7 +71,7 @@ spec:
         message: |-
           {{ $labels.DstK8S_OwnerName }} in {{ $labels.DstK8S_Namespace }} is experiencing high DNS Latencies.
         summary: "Trigger for any workloads experiencing > than 100ms DNS Latency."
-      expr: topk(7, (histogram_quantile(0.9, sum(rate(netobserv_workload_dns_latency_seconds_bucket{SrcK8S_Namespace!=""}[2m])) by (le,SrcK8S_Namespace,SrcK8S_OwnerName,DstK8S_Namespace,DstK8S_OwnerName))*1000> 100) or (histogram_quantile(0.9, sum(rate(netobserv_workload_dns_latency_seconds_bucket{DstK8S_Namespace!=""}[2m])) by (le,SrcK8S_Namespace,SrcK8S_OwnerName,DstK8S_Namespace,DstK8S_OwnerName))*1000 > 100))
+      expr: histogram_quantile(0.9, sum(rate(netobserv_workload_dns_latency_seconds_bucket{DstK8S_Namespace!=""}[2m])) by (le,DstK8S_Namespace,DstK8S_OwnerName))*1000 > 100
       for: 10s
       labels:
         severity: warning
@@ -78,7 +91,7 @@ Above config add 100ms delay to every 2nd DNS request coming in for example.org.
 
 ![DNSLatency alert triggered for threshold > 100ms](images/dns_latency_alert_firing.png)
 
-Similarly, additional alerts on different DNS response codes could be set up, for example an alert for DNS lookup failures such as DNS queries receiving NXDOMAIN or SERVFAIL can also be set up as flowlogs and metrics are already enriched with DNS response codes.
+Similarly, additional alerts on different DNS response codes could be set up, for example an alert for DNS lookup failures such as DNS queries receiving NXDOMAIN or SERVFAIL responses can also be set up as flowlogs and metrics are already enriched with DNS response codes.
 
 In addition to metrics for `DNSTracking` feature, Network Observability provides metrics for other features such as Round-Trip-Times and Packet Drops as well.
 
