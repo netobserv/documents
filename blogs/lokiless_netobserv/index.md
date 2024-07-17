@@ -24,8 +24,8 @@ Test bench environment:
 
     ![unfiltered topology view](images/owner_screenshot.png)
 
-* Cluster config: 3 worker and 3 master nodes, AWS m5.2xlarge machines
-* LokiStack size: 1x.extra-small
+* Cluster config: 9 worker and 3 master nodes, AWS m5.2xlarge machines
+* LokiStack size: 1x.small
 
 Results:
 
@@ -33,9 +33,9 @@ Results:
 
   | Time Range | Loki      | Prometheus
   | :--------: | :-------: | :----------:
-  | Last 5m    | 2287 ms   | 95.5 ms
-  | Last 1h    | 4581 ms   | 236 ms
-  | Last 6h    | > 10 s    | 394 ms
+  | Last 5m    | 984 ms    | 99 ms
+  | Last 1h    | 2410 ms   | 236 ms
+  | Last 6h    | > 10 s    | 474 ms
 
 As time range to fetch network flows gets wider, Loki queries tends to get slower or timing out, while Prometheus queries is able render the data within fraction of a second.
 
@@ -68,7 +68,7 @@ We saw having Prometheus as datasource provides impressive performance gains and
 
    b. In this release, Network Observability also introduced `FlowMetrics` API which lets you create custom metrics which may not be available out of the box. `FlowMetrics` API creates on-demand Prometheus metrics based on enriched flowlogs fields which can be used as labels for custom Prometheus metrics. _Note: Be careful with this option though, introducing metrics that may have labels with high cardinality increases cluster's Promethes resource usage and may impact overall cluster monitoring_.
 
-3. Restricted multi-tenancy - Currently Prometheus in OpenShift cluster currently doesn't support multi-tenancy in a way that Loki does, non-admin users can be added to `cluster-monitoring-view` where user will have access to view all available Prometheus metrics.
+3. Restricted multi-tenancy - Prometheus in OpenShift cluster currently doesn't support multi-tenancy in a way that Loki does, non-admin users can be added to `cluster-monitoring-view` where user will have access to view all available Prometheus metrics.
 
    For example, below command can be used to enable Prometheus metrics visualizing for `testuser-0` user.
 
