@@ -52,7 +52,12 @@ Below graphs shows total vCPU, memory and storage usage for a recommended Networ
 
 ![Compare total vCPUs utilized with and without Loki](<blogs/lokiless_netobserv/images/vCPUs consumed by NetObserv stack.png/Total vCPUs consumed.png>)
 ![Compare total RSS utilized with and without Loki](<blogs/lokiless_netobserv/images/Memory consumed by NetObserv stack.png>)
-![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/Storage consumed by NetObserv stack.png>)
+
+Let's look at the amount of estimated storage you'd need for all the network flows and Prometheus metrics that Network Observability has to store. For context, even when Loki is installed Network Observability publishes default set of metrics for monitoring dashboards, and it adds additional metrics when Loki is disabled to visualize network flows. The graphs you see below shows the estimated amount of storage required to store Network flows (when configured with Loki), Prometheus metrics and Kafka for intermediary storage layer between eBPF-agent and flowlogs-pipeline.
+
+![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/15 days of storage consumption.png>)
+
+In different test beds above, we find storage savings of 75-90% when Network Observability is configured without Loki for storing network flows and metrics of 15 days period.
 
 <sup>*</sup> actual resource utilization may depend on various factors such as flowcollector sampling size, number of workloads and nodes in an OCP cluster
 
