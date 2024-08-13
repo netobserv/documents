@@ -24,7 +24,7 @@ Test bench environment:
 
     ![unfiltered topology view](images/owner_screenshot.png)
 
-* Cluster config: 9 worker and 3 master nodes, AWS m5.2xlarge machines
+* Test bed: 9 worker and 3 master nodes, AWS m5.2xlarge machines
 * LokiStack size: 1x.small
 
 Results:
@@ -40,18 +40,19 @@ Results:
 As time range to fetch network flows gets wider, Loki queries tends to get slower or timing out, while Prometheus queries is able render the data within fraction of a second.
 
 ### Resource utilization:
-In our tests conducted on 3 different test beds with varied workloads and network throughput, when Network Observability is configured without Loki, total savings of Memory usage could be in range 12-60% and CPU utilzation could be lower by 20-30%<sup>*</sup>. Not to mention you will not need to provision and plan for additional storage in public clouds for Loki, overall reducing the cost and improving operational efficiency significantly.
+In our tests conducted on 3 different test beds with varied workloads and network throughput, when Network Observability is configured without Loki, total savings of Memory usage could be in range 45-65% and CPU utilzation could be lower by 10-20%<sup>*</sup>. Not to mention you will not need to provision and plan for additional object storage in public clouds for Loki, overall reducing the cost and improving operational efficiency significantly.
 
 In our perf tests, [kube-burner](https://github.com/kube-burner/kube-burner) workloads were used to generate several objects and create heavy network traffic. We used sampling rate of 1 for all below tests. To further describe each test bed:
 
 1. Test bed 1: node-density-heavy workload ran against 25 nodes cluster.
 2. Test bed 2: ingress-perf workload ran against 65 nodes cluster.
-3. Test bed 3: cluster-densit-v2 workload ran against 120 nodes cluster
+3. Test bed 3: cluster-density-v2 workload ran against 120 nodes cluster
 
-Below graphs shows total vCPU and memory usage for a recommended Network Observability stack (flowlogs-pipeline, eBPF-agent, Kafka and optionally Loki) for production clusters.
+Below graphs shows total vCPU, memory and storage usage for a recommended Network Observability stack  - flowlogs-pipeline, eBPF-agent, Kafka, Prometheus and optionally Loki for production clusters.
 
-![Compare total vCPUs utilized with and without Loki](<images/Total vCPUs consumed.png>)
-![Compare total RSS utilized with and without Loki](<images/Total Memory (RSS) consumed.png>)
+![Compare total vCPUs utilized with and without Loki](<blogs/lokiless_netobserv/images/vCPUs consumed by NetObserv stack.png/Total vCPUs consumed.png>)
+![Compare total RSS utilized with and without Loki](<blogs/lokiless_netobserv/images/Memory consumed by NetObserv stack.png>)
+![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/Storage consumed by NetObserv stack.png>)
 
 <sup>*</sup> actual resource utilization may depend on various factors such as flowcollector sampling size, number of workloads and nodes in an OCP cluster
 
@@ -121,6 +122,6 @@ In addition to metrics for `DNSTracking` feature, Network Observability provides
 
 Network Observability operator provides the visibility you need to proactively detect issues within OpenShift cluster networking. Now with an option to disable loki, Network Observability operator provides light weight solution to visualize, diagnose and troubleshoot networking issues faster at a lower cost. Network Observability's Prometheus metrics can be leveraged to set up user defined alerts in your OCP cluster.
 
-While some feature parity gap exists when compared to configuration with Loki enabled, team is actively working to narrow that gap and enhance this feature by enabling visualization for packet drops and better Prometheus multi-tenancy.
-
 Whether you have already deployed or considering to deploy it, we'd love to engage with you and hear your thoughts [here](https://github.com/netobserv/network-observability-operator/discussions).
+
+Special thanks to Joel Takvorian, Julien Pinsonneau, and Sara Thomas for providing information for this article.
