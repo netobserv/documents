@@ -53,20 +53,26 @@ Below graphs shows total vCPU, memory and storage usage for a recommended Networ
 ![Compare total vCPUs utilized with and without Loki](<blogs/lokiless_netobserv/images/vCPUs consumed by NetObserv stack.png/Total vCPUs consumed.png>)
 ![Compare total RSS utilized with and without Loki](<blogs/lokiless_netobserv/images/Memory consumed by NetObserv stack.png>)
 
-Let's look at the amount of estimated storage you'd need for all the network flows and Prometheus metrics that Network Observability has to store. For context, even when Loki is installed Network Observability publishes default set of metrics for monitoring dashboards, and it adds additional metrics when Loki is disabled to visualize network flows. The graphs you see below shows the estimated amount of storage required to store Network flows (when configured with Loki), Prometheus metrics and Kafka for intermediary storage layer between eBPF-agent and flowlogs-pipeline.
+Let's look at the amount of estimated storage you'd need for all the network flows and Prometheus metrics that Network Observability has to store. For context, even when Loki is installed Network Observability publishes default set of Prometheus metrics for monitoring dashboards, and it adds additional metrics when Loki is disabled to visualize network flows. The graphs below shows the estimated amount of storage required to store 15 days of Network flows (when configured with Loki), Prometheus metrics and Kafka as intermediary data streaming layer between eBPF-agent and flowlogs-pipeline. 
 
-![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/15 days of storage consumption.png>)
+The network flows rate for each test bed was 10K, 13K, 30K flows/second respectively. The storage for Loki includes AWS S3 bucket utilization and its PVC usage. For Kafka PVC storage value, it assumes 1 day of retention or 100 GB whichever is attained first.
 
-In different test beds above, we find storage savings of 75-90% when Network Observability is configured without Loki for storing network flows and metrics of 15 days period.
+![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/15 days Storage consumption.png>)
 
-<sup>*</sup> actual resource utilization may depend on various factors such as flowcollector sampling size, number of workloads and nodes in an OCP cluster
+As seen across test beds above, we find storage savings of 90% when Network Observability is configured without Loki.
+
+<sup>*</sup> actual resource utilization may depend on various factors such as network traffic, flowcollector sampling size, number of workloads and nodes in an OCP cluster
 
 ## Trade-offs:
 We saw having Prometheus as datasource provides impressive performance gains and sub-second query times, however it introduces below constraints:
 
-1. Without storage of network flows it no longer provides Traffic flows table. <TODO: insert a picture Traffic table greyed out>
+1. Without storage of network flows it no longer provides Traffic flows table.
 
-2. Per-pod level of resource granularity is not available since it causes Prometheus metrics to have high cardinality. <TODO: insert a picture where diff between with-Loki and without-Loki Scope>
+![Disabled table view](images/disabled_table_view.png)
+
+2. Per-pod level of resource granularity is not available since it causes Prometheus metrics to have high cardinality.
+
+![Topology scope changes](images/topology_scope.png)
    
    Should you need per-flow or per-pod level of granularity for diagnostic and troubleshooting needs, other than enabling Loki you have multiple other options available:
 
