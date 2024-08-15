@@ -1,8 +1,8 @@
-# Network Observability without Loki
+# Light-weight Network Observability Operator without Loki
 
 By: Mehul Modi, Steven Lee
 
-Recently, the Network Observability Operator released version  1.6, which added a major enhancement to provide network insights for your OpenShift cluster without Loki. This enhancement was also featured in [What's new in Network Observability 1.6](https://developers.redhat.com/articles/2024/08/12/whats-new-network-observability-16) blog, providing a quick overview of the feature. In this blog, lets look at some of the advantages and trade-offs users would have when deploying the Network Observability Operator with Loki disabled. As more metrics are enabled by default with this feature, we'll also demonstrate a use-case on how those metrics can benefit users for real world scenarios.
+Recently, the Network Observability Operator released version  1.6, which added a major enhancement to provide network insights for your OpenShift cluster without Loki. This enhancement was also featured in [What's new in Network Observability 1.6](https://developers.redhat.com/articles/2024/08/12/whats-new-network-observability-16) blog, providing a quick overview of the feature. Until this release, Loki was required to be deployed alongside Network Observability to store the network flows data. In this blog, lets look at some of the advantages and trade-offs users would have when deploying the Network Observability Operator with Loki disabled. As more metrics are enabled by default with this feature, we'll also demonstrate a use-case on how those metrics can benefit users for real world scenarios.
 
 # Configure Network Observability without Loki
 Loki as datasource is currently enabled by default. To configure the Network Observability Operator without Loki, set the `FlowCollector` resource specification, `.spec.loki.enable`, to `false`
@@ -21,9 +21,7 @@ Prometheus queries are blazing fast compared to Loki queries, but don't take my 
 
 **Test bench environment**:
 
-* **Test**: We conducted 50 identical queries for 3 separate time ranges to render a topology view for both Loki and Prometheus. Such a query requests all K8s Owners for the workload running in an OpenShift Cluster that had  network flows associated to them. Since we did not have any applications running, only Infrastructure workloads generated network traffic. In Network Observability such an unfiltered view renders topology rendered as follows: 
-
-    ![unfiltered topology view](images/owner_screenshot.png)
+* **Test**: We conducted 50 identical queries without any filters for 3 separate time ranges to render a topology view for both Loki and Prometheus. Such a query requests all K8s Owners for the workload running in an OpenShift Cluster that had network flows associated to them.
 
 * **Test bed**: 9 worker and 3 master nodes, AWS m5.2xlarge machines
 * **LokiStack size**: 1x.small
@@ -45,20 +43,20 @@ In our tests conducted on 3 different test beds with varied workloads and networ
 
 In our perf tests, [kube-burner](https://github.com/kube-burner/kube-burner) workloads were used to generate several objects and create heavy network traffic. We used a sampling rate of 1 for all of the following tests:
 
-1. **Test bed 1**: node-density-heavy workload ran against 25 nodes cluster.
-2. **Test bed 2**: ingress-perf workload ran against 65 nodes cluster.
-3. **Test bed 3**: cluster-density-v2 workload ran against 120 nodes cluster
+1. **Test bed 1**: 25 nodes cluster - this test takes into account the total number of namespace, pods and services in an OpenShift Container Platform cluster, places load on the eBPF agent, and represents use cases with a high number of workloads for a given cluster size. For example, Test 1 consists of 76 Namespaces, 5153 Pods, and 2305 Services.
+2. **Test bed 2**: 65 nodes cluster - this test takes into account a high ingress traffic volume.
+3. **Test bed 3**: 120 nodes cluster - this test takes into account the total number of namespace, pods and services in an OpenShift Container Platform cluster, places load on the eBPF agent on a larger scale than Test bed 1, and represents use cases with a high number of workloads for a given cluster size. For example, Test bed 3 consists of 553 Namespaces, 6998 Pods, and 2508 Services
 
 The following graphs show total vCPU, memory and storage usage for a recommended Network Observability stack  - flowlogs-pipeline, eBPF-agent, Kafka, Prometheus and optionally Loki for production clusters.
 
-![Compare total vCPUs utilized with and without Loki](<blogs/lokiless_netobserv/images/vCPUs consumed by NetObserv stack.png/Total vCPUs consumed.png>)
-![Compare total RSS utilized with and without Loki](<blogs/lokiless_netobserv/images/Memory consumed by NetObserv stack.png>)
+![Compare total vCPUs utilized with and without Loki](<images/vCPUs consumed by NetObserv stack.png>)
+![Compare total RSS utilized with and without Loki](<images/Memory consumed by NetObserv stack.png>)
 
 Let's look at the amount of estimated storage you need for all the network flows and Prometheus metrics that Network Observability has to store. For context, even when Loki is installed, Network Observability publishes a default set of Prometheus metrics for monitoring dashboards, and it adds additional metrics when Loki is disabled to visualize network flows. The graphs below show the estimated amount of storage required to store 15 days of network flows data (when configured with Loki), with Prometheus metrics and Kafka as an intermediary data streaming layer between the eBPF-agent and the flowlogs-pipeline. 
 
 The network flows rate for each test bed was 10K, 13K, 30K flows/second respectively. The storage for Loki includes AWS S3 bucket utilization and its PVC usage. For Kafka PVC storage value, it assumes 1 day of retention or 100 GB whichever is attained first.
 
-![Compare total Storage utilized with and without Loki](<blogs/lokiless_netobserv/images/15 days Storage consumption.png>)
+![Compare total Storage utilized with and without Loki](<images/15 days Storage consumption.png>)
 
 As seen across the test beds, we find a storage savings of 90% when Network Observability is configured without Loki.
 
