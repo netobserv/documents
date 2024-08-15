@@ -2,10 +2,10 @@
 
 By: Mehul Modi, Steven Lee
 
-Recently, the Network Observability Operator released version  1.6, which added a major enhancement to provide network insights for your OpenShift cluster without Loki. This enhancement was also featured in [What's new in Network Observability 1.6](../whats_new_1.6) blog, providing a quick overview of the feature. In this blog, lets look at some of the advantages and trade-offs users would have when deploying the Network Observability Operator with Loki disabled. As more metrics are enabled by default with this feature, we'll also demonstrate a use-case on how those metrics can benefit users for real world scenarios.
+Recently, the Network Observability Operator released version  1.6, which added a major enhancement to provide network insights for your OpenShift cluster without Loki. This enhancement was also featured in [What's new in Network Observability 1.6](https://developers.redhat.com/articles/2024/08/12/whats-new-network-observability-16) blog, providing a quick overview of the feature. In this blog, lets look at some of the advantages and trade-offs users would have when deploying the Network Observability Operator with Loki disabled. As more metrics are enabled by default with this feature, we'll also demonstrate a use-case on how those metrics can benefit users for real world scenarios.
 
 # Configure Network Observability without Loki
-Loki as datasource is currently enabled by default. To configure the Network Observability Operator without Loki, set  the `FlowCollector` resource specification, `.spec.loki.enable`, to `false`
+Loki as datasource is currently enabled by default. To configure the Network Observability Operator without Loki, set the `FlowCollector` resource specification, `.spec.loki.enable`, to `false`
 
 ```yaml
 loki:
@@ -14,11 +14,12 @@ loki:
 When Loki is disabled, metrics continue to get scraped by the OpenShift cluster Prometheus without any additional configuration. The Network Traffic console uses Prometheus as a source for fetching the data.
 
 ## Performance and Resource utilization gains
+In this section, lets dive into the query performance and resource utilization differences when Network Observability is configured with Loki and without it.
 
 ### Query performance:
 Prometheus queries are blazing fast compared to Loki queries, but don't take my word for it, let's look at the data from the query performance tests: 
 
-Test bench environment:
+**Test bench environment**:
 
 * **Test**: We conducted 50 identical queries for 3 separate time ranges to render a topology view for both Loki and Prometheus. Such a query requests all K8s Owners for the workload running in an OpenShift Cluster that had  network flows associated to them. Since we did not have any applications running, only Infrastructure workloads generated network traffic. In Network Observability such an unfiltered view renders topology rendered as follows: 
 
@@ -44,9 +45,9 @@ In our tests conducted on 3 different test beds with varied workloads and networ
 
 In our perf tests, [kube-burner](https://github.com/kube-burner/kube-burner) workloads were used to generate several objects and create heavy network traffic. We used a sampling rate of 1 for all of the following tests:
 
-1. Test bed 1: node-density-heavy workload ran against 25 nodes cluster.
-2. Test bed 2: ingress-perf workload ran against 65 nodes cluster.
-3. Test bed 3: cluster-density-v2 workload ran against 120 nodes cluster
+1. **Test bed 1**: node-density-heavy workload ran against 25 nodes cluster.
+2. **Test bed 2**: ingress-perf workload ran against 65 nodes cluster.
+3. **Test bed 3**: cluster-density-v2 workload ran against 120 nodes cluster
 
 The following graphs show total vCPU, memory and storage usage for a recommended Network Observability stack  - flowlogs-pipeline, eBPF-agent, Kafka, Prometheus and optionally Loki for production clusters.
 
