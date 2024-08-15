@@ -77,7 +77,7 @@ We saw having Prometheus as datasource provides impressive performance gains and
    
    Should you need per-flow or per-pod level of granularity for diagnostic and troubleshooting, other than enabling Loki you have multiple other options available:
 
-   a. Collect flowlogs into your preferred data analytics tool using `.spec.exporters` config in Flowcollector, currently Kafka and IPFIX are supported exporters.
+   a. Collect flowlogs into your preferred data analytics tool using the`.spec.exporters` configuration in the FlowCollector. Currently Kafka and IPFIX are supported exporters.
 
    b. In this release, Network Observability also introduced the `FlowMetrics` API, which lets you create custom metrics that are not available out of the box. The `FlowMetrics` API creates on-demand Prometheus metrics based on enriched flowlogs fields, which can be used as labels for custom Prometheus metrics. _Note: Use this option with caution, as introducing metrics that may have labels with high cardinality increases the cluster's Prometheus resource usage and might impact overall cluster monitoring_.
 
