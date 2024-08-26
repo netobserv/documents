@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: netobserv-prom
+  namespace: netobserv
+rules:
+  - verbs:
+      - create
+    apiGroups:
+      - metrics.k8s.io
+    resources:
+      - pods
