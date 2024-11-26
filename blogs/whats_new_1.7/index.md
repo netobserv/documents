@@ -2,7 +2,7 @@
 
 Network Observability 1.7 aligns with OpenShift Container Platform (OCP) 4.17, although it is compatible all the way back to 4.12.  Network Observability is an optional operator that provides insights into your network traffic and can help you troubleshoot networking issues.  There is an upstream version that runs on bare Kubernetes, but this blog focuses on the downstream version on OCP where you get the most benefit.
 
-It was only a few months ago when 1.6 was released, and you can read all about it in my [last blog](https://developers.redhat.com/articles/2024/08/12/whats-new-network-observability-16).  There are a number of features added in this release.  The most notable ones are:
+It was only a few months ago when 1.6 was released, and you can read all about it in my [last post](https://developers.redhat.com/articles/2024/08/12/whats-new-network-observability-16).  There are a number of features added in this release.  The most notable ones are:
 
 - Export data using OpenTelemetry Protocol (OTLP)
 - Enhance secondary interface support
@@ -42,7 +42,7 @@ Network Observability 1.7 supports all three scenarios when **privileged** mode 
 <p style="text-align: center">Figure 3: eBPF Agent configuration - Privileged mode</p>
 
 
-NetObserv handles the rest by tracking the secondary interfaces that come and go, and identifying which namespace and pod they belong to.  In **Observe > Network Traffic**, Traffic flows table, click **Show advanced options** on the right side, then **Manage columns**, and add the column **Interfaces and Directions** (Figure 4).  If the flows for these interfaces show `n/a` for the **Name** and **Namespace**, follow [these steps](https://docs.openshift.com/container-platform/4.17/observability/network_observability/network-observability-secondary-networks.html#network-observability-virtualization-config_network-observability-secondary-networks) to provide FlowCollector with more information to be able to provide this data.
+Network Observability handles the rest by tracking the secondary interfaces that come and go, and identifying which namespace and pod they belong to.  In **Observe > Network Traffic**, Traffic flows table, click **Show advanced options** on the right side, then **Manage columns**, and add the column **Interfaces and Directions** (Figure 4).  If the flows for these interfaces show `n/a` for the **Name** and **Namespace**, follow [these steps](https://docs.openshift.com/container-platform/4.17/observability/network_observability/network-observability-secondary-networks.html#network-observability-virtualization-config_network-observability-secondary-networks) to provide FlowCollector with more information to be able to provide this data.
 
 ![Traffic flows - Interfaces](images/traffic_flows-interfaces.png)
 <p style="text-align: center">Figure 4: Traffic flows - Interfaces</p>
@@ -97,7 +97,7 @@ In the **Traffic flows** table, you can add the **TCP flags** column.  You can a
 
 ## Network Observability in Developer perspective
 
-For the first time, NetObserv is providing observability in the Developer perspective!  If you are in Administrator perspective, click **Administrator** in the upper left corner and select **Developer**.  Click **Project** and select a project in the drop down near the top of the page.  In the **Inventory** section, click **Pods** or **Service**.   Click a particular item on a row.  There is a **Network Traffic** tab.  Click this link to bring up the familiar page with **Overview**, **Traffic flows**, and **Topology** tabs filtered to this pod or service (Figure 6).  To provide access to a specific user, group, or non-cluster admin, follow [these steps](https://docs.openshift.com/container-platform/4.17/observability/network_observability/installing-operators.html#network-observability-multi-tenancy_network_observability) to add authorization to various roles.
+For the first time, Network Observability is providing observability in the Developer perspective!  If you are in Administrator perspective, click **Administrator** in the upper left corner and select **Developer**.  Click **Project** and select a project in the drop down near the top of the page.  In the **Inventory** section, click **Pods** or **Service**.   Click a particular item on a row.  There is a **Network Traffic** tab.  Click this link to bring up the familiar page with **Overview**, **Traffic flows**, and **Topology** tabs filtered to this pod or service (Figure 6).  To provide access to a specific user, group, or non-cluster admin, follow [these steps](https://docs.openshift.com/container-platform/4.17/observability/network_observability/installing-operators.html#network-observability-multi-tenancy_network_observability) to add authorization to various roles.
 
 ![Developer perspective - Network Observability](images/developer_perspective-network_traffic.png)
 <p style="text-align: center">Figure 6: Network Observability in Developer perspective</p>
