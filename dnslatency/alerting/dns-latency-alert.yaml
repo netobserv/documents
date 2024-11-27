@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dns-latency-alert
+  namespace: netobserv
+spec:
+  groups:
+  - name: DNSLatencyAlert
+    rules:
+    - alert: DNSLatencyAlert
+      annotations:
+        message: |-
+          {{ $labels.DstK8S_OwnerName }} in {{ $labels.DstK8S_Namespace }} is experiencing high DNS Latencies.
+        summary: "Trigger for any workloads experiencing > than 100ms DNS Latency."
+      expr: histogram_quantile(0.9, sum(rate(netobserv_workload_dns_latency_seconds_bucket{DstK8S_Namespace!=""}[2m])) by (le,DstK8S_Namespace,DstK8S_OwnerName))*1000 > 100
+      for: 10s
+      labels:
+        severity: warning
