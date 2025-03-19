@@ -69,4 +69,3 @@ objects:
 parameters:
 - name: DEFAULT_SC
   value: gp3-csi
-  
