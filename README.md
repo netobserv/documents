@@ -40,6 +40,7 @@ If you don't need the entire stack, you can just [check components](#repositorie
 - [Loki microservices](./loki_microservices.md): Scalable loki deployment
 - [Loki operator](./loki_operator.md): Deploying NetObserv with the Loki Operator
 - [Loki simple](./loki_simple.md): Automatic deployment Loki with the Network Observability Operator
+- [OpenTelemetry](./OpenTelemetry.md): How to setup a test environment for otlp.
 - [Next](./next.md): Informal doc gathering ideas about potential next steps.
 - [Openshift](./openshift.md): Deploy using OpenShift Container Platform
 - [Sample apps](./sample_apps.md): a few suggestions to generate traffic, useful for testing NetObserv.
