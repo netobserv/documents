@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1
+apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: kafka-cluster
@@ -11,6 +11,7 @@ spec:
         type: internal
         tls: true
         authentication:
+          # for SASL, change to scram-sha-512
           type: tls
       - name: external
         port: 9094

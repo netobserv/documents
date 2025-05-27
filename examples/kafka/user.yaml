@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1
+apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaUser
 metadata:
   labels:
@@ -6,4 +6,5 @@ metadata:
   name: flp-kafka
 spec:
   authentication:
+    # for SASL, change to scram-sha-512
     type: tls
