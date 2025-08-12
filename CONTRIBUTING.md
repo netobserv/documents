@@ -2,7 +2,7 @@
 
 These contribution guidelines apply to all projects / repositories in the [netobserv organization](https://github.com/netobserv/). Almost the source code is licensed under [Apache v2.0](https://www.apache.org/licenses/LICENSE-2.0.html), with the exception of our [BPF code](https://github.com/netobserv/netobserv-ebpf-agent/blob/e3089669f1fbc91cf56a19e190f5aa8d29aaa4ba/bpf/flows.c#L303) which is GPL.
 
-Contributions can take the shape of pull requests for documentation or code change, providing feedback, opening bug reports or even [writing blog posts](https://github.com/netobserv/netobserv.github.io). They are always welcome! For large changes, it is recommended to [start a discussion](https://github.com/netobserv/network-observability-operator/discussions/new/choose) prior to opening a pull request. Or as an alternative, you can reach out to the team on the CNCF slack channel [#netobserv-project](http://cloud-native.slack.com/).
+Contributions can take the shape of pull requests for documentation or code change, providing feedback, opening bug reports or even [writing blog posts](https://github.com/netobserv/netobserv.github.io). They are always welcome! For large changes, it is recommended to [start a discussion](https://github.com/netobserv/network-observability-operator/discussions/new/choose) prior to opening a pull request. Or as an alternative, you can reach out to the team on the CNCF slack channel [#netobserv-project](http://cloud-native.slack.com/) (to create an account, get an invite from https://slack.cncf.io/).
 
 There should be mutual respect between contributors and maintainers.
 
