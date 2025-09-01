@@ -1,0 +1,13 @@
+apiVersion: k8s.ovn.org/v1
+kind: UserDefinedNetwork
+metadata:
+  name: udn-network-primary-layer3
+  namespace: test-udn
+spec:
+  topology: Layer3
+  layer3:
+    role: Primary
+    mtu: 9000
+    subnets: 
+    - cidr: 10.150.0.0/16
+      hostSubnet: 24

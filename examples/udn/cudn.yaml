@@ -1,0 +1,13 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: cudn-network
+spec:
+  namespaceSelector:
+    matchLabels:
+      test.io: cudn-network
+  network:
+    topology: Layer3
+    layer3:
+      role: Primary
+      subnets: [{cidr: "10.100.0.0/16"}]

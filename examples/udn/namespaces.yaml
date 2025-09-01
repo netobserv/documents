@@ -1,0 +1,23 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: test-cudn-1
+  labels:
+    test.io: cudn-network
+    k8s.ovn.org/primary-user-defined-network: ""
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: test-cudn-2
+  labels:
+    test.io: cudn-network
+    k8s.ovn.org/primary-user-defined-network: ""
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: test-udn
+  labels:
+    k8s.ovn.org/primary-user-defined-network: ""
+---
