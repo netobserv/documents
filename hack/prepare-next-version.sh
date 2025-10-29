@@ -39,7 +39,7 @@ then
   exit 0
 fi
 
-current=`sed -r 's/BUILDVERSION=(.+)/\1/' ${dockerfile_args_path}`
+current=`cat ${dockerfile_args_path} | grep "BUILDVERSION=" | sed -r 's/BUILDVERSION=(.+)/\1/'`
 x=`echo ${current} | cut -d . -f1`
 y=`echo ${current} | cut -d . -f2`
 z=`echo ${current} | cut -d . -f3`
@@ -57,7 +57,7 @@ restore_branch() {
 trap restore_branch EXIT
 
 echo "This script should run from the branch that was just released: it uses the current version, as defined in Dockerfile-args.downstream, to know which branches to update."
-echo "Current version detected: $current"
+echo "Current version detected: $current ($x.$y.$z)"
 if [[ "${z}" == "0" ]]; then
   next_y="$x.$((y+1)).$z"
   next_z="$x.$y.$((z+1))"
@@ -131,6 +131,8 @@ echo "- The tekton pipelines (on-push and on-pull-request) to point to zstream i
 echo ""
 echo "You can also bring manual changes before coming back here and continue."
 echo ""
+read -p "Press any key to continue (diff will be displayed) " -n 1 -r
+git diff HEAD
 
 read -p "Looks good to you? [y/N] " -n 1 -r
 echo ""
@@ -162,6 +164,7 @@ if [[ "${z}" == "0" ]]; then
 
   echo "Updating Dockerfile-args.downstream..."
   sed -i -r "s/^BUILDVERSION=.+/BUILDVERSION=${next_y}/" ${dockerfile_args_path}
+  sed -i -r "s/^BUILDVERSION_Y=.+/BUILDVERSION_Y=$x.$((y+1))/" ${dockerfile_args_path}
 
   echo "Checking for .tekton files..."
   check_tekton_y "./.tekton/${cpnt}-ystream-pull-request.yaml" "./.tekton/${cpnt}-zstream-pull-request.yaml"
@@ -181,6 +184,8 @@ if [[ "${z}" == "0" ]]; then
   echo ""
   echo "You can also bring manual changes before coming back here and continue."
   echo ""
+  read -p "Press any key to continue (diff will be displayed) " -n 1 -r
+  git diff HEAD
 
   read -p "Looks good to you? [y/N] " -n 1 -r
   echo ""
