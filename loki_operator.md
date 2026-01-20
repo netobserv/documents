@@ -2,7 +2,7 @@
 
 This page provides a quick walk-through for setting up the Loki Operator with NetObserv. You can [find here more documentation](https://loki-operator.dev/docs/prologue/quickstart.md/) (or [there for OpenShift](https://docs.openshift.com/container-platform/4.11//logging/cluster-logging-loki.html)).
 
-The Loki Operator integrates a [gateway](https://github.com/observatorium/api) that implements multi-tenancy & authentication with Loki for logging. However, NetObserv itself is not (yet) multi-tenant.
+The Loki Operator integrates a [gateway](https://github.com/observatorium/api) that implements multi-tenancy & authentication with Loki for logging.
 
 NetObserv requires to use a specific tenant for Loki, named `network`, which uses a specific tenant mode implemented in Loki Operator 5.6+. For that reason, NetObserv is not compatible with prior version of the Loki Operator.
 
@@ -92,23 +92,6 @@ oc adm policy add-cluster-role-to-user netobserv-loki-reader test
 
 Cluster admins do not need this role binding.
 
-### Testing multi-tenancy
-
-Using the loki-operator 5.7 (or above) + FORWARD mode allows multi-tenancy, meaning that in this mode, user permissions on namespaces are enforced so that users would only see flow logs from/to namespaces that they have access to. You don't need any extra configuration for NetObserv or Loki. Here's a suggestion of steps in order to test it in OpenShift:
-
-- Install Loki Operator + NetObserv as mentioned above.
-- If you haven't created a project-admin user yet:
-  - In ocp console, go to "Users management" > "Users" and click on "Add IDP". For a quick test you can use a "Htpasswd" type
-  - E.g. set as content: `test:$2y$10$Z2CXWdNCkp6rvoR5bmbI8OyiTYsUreOMn6sV2UNzpl9c1Eb1vBqO.` which stands for user `test` / `test`.
-- Wait a few seconds or minutes that the IDP is working, then login (e.g. in browser incognito mode - you should see the new htpasswd option from the login screen)
-- Create a new project named "test" from this session. By doing so, the user is a project-admin on that namespace.
-- Deploy some workload in this namespace that will generate some flows (you don't need to do so as the test user - doing so as a cluster admin works as well)
-  - E.g. `kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-naked.yml -n test`
-- In the admin perspective, a new "Observe" menu should have appeared, with "Network Traffic" as the only page. Go to Network Traffic.
-- You should see an error (403). It's expected: the user needs to have explicit permission to get flows.
-  - Apply the role binding: `oc adm policy add-cluster-role-to-user netobserv-loki-reader test`
-- Refresh the flow logs: you should see traffic, limited to the allowed namespace.
-
 ## Troubleshooting
 
 - Logs are by default `--log.level=warn`. 
@@ -131,56 +114,3 @@ Check [ZeroSSL.com CA with acme.sh](./hack_dex.md#zerosslcom-ca-with-acmesh)
 ```bash
 oc exec -it netobserv-plugin-d894b4544-97tq2 -- curl --cert /var/loki-status-certs-user/tls.crt  --key /var/loki-status-certs-user/tls.key  --cacert /var/loki-status-certs-ca/service-ca.crt -k -H "X-Scope-OrgID: network"  https://loki-query-frontend-http:3100/loki/api/v1/label/DstK8S_Namespace/values
 ```
-
-### Loki "input size too long" error
-
-This error is generally seen when non cluster-admin users have access to many namespaces. Since the operator gateway will inject namespaces in queries for
-multi-tenancy, this may result in queries being too long, reaching 5120 characters (which sounds actually like a very reasonable limit for non-cluster-admin users), and thus being rejected by Loki.
-
-#### For cluster admins
-
-Users identified as cluster admins should not see this error because there is no namespace-based restriction for them. The Loki operator performs this identification by **checking if users belong to one of the defined cluster-admin groups**.
-
-Note that having the cluster-admin **role** does not imply belonging to the cluster-admin **group**. So you should double-check groups.
-
-With OpenShift, to create a cluster-admin group, run:
-
-```bash
-oc adm groups new cluster-admin
-```
-
-To add a user to cluster-admin group, run:
-
-```bash
-oc adm groups add-users cluster-admin <username>
-```
-
-You may also want to give cluster-admin role for all group members rather than one by one:
-
-```bash
-oc adm policy add-cluster-role-to-group cluster-admin cluster-admin
-```
-
-Running these commands should solve the problem. It might be necessary to wait a couple of minutes for changes to be effective.
-
-By default, the Loki operator recognizes three groups as cluster-admins: `system:cluster-admins`, `cluster-admin` and `dedicated-admin`. If you already have a cluster admin group with a different name, you can override this default in the `LokiStack` configuration:
-
-```yaml
-apiVersion: loki.grafana.com/v1
-kind: LokiStack
-metadata:
-  name: loki
-  namespace: netobserv
-spec:
-  # ... other settings here ...
-  tenants:
-    mode: openshift-network
-    openshift:
-      adminGroups: 
-      - my-admins-group
-```
-
-#### For non cluster admins
-
-In most cases, non cluster admins shouldn't see this error as the configured input size limit should be long enough. However, it may still occur than users have access to many namespaces despite not being cluster admins. You may create a new group for these users, and configure the `LokiStack` tenant as shown above. Beware that in that case, these users have access to all the flows, without namespace restriction.
-
