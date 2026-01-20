@@ -87,7 +87,7 @@ Once the Loki stack is up and running, you need to configure NetObserv to commun
 You then need to define `ClusterRoleBindings` for allowed users or groups, such as [this one](./examples/loki-stack/rolebinding-user-test.yaml) for a user named `test`. This can also be done from the CLI:
 
 ```bash
-oc adm policy add-cluster-role-to-user netobserv-reader test
+oc adm policy add-cluster-role-to-user netobserv-loki-reader test
 ```
 
 Cluster admins do not need this role binding.
@@ -106,7 +106,7 @@ Using the loki-operator 5.7 (or above) + FORWARD mode allows multi-tenancy, mean
   - E.g. `kubectl apply -f https://raw.githubusercontent.com/jotak/demo-mesh-arena/main/quickstart-naked.yml -n test`
 - In the admin perspective, a new "Observe" menu should have appeared, with "Network Traffic" as the only page. Go to Network Traffic.
 - You should see an error (403). It's expected: the user needs to have explicit permission to get flows.
-  - Apply the role binding: `oc adm policy add-cluster-role-to-user netobserv-reader test`
+  - Apply the role binding: `oc adm policy add-cluster-role-to-user netobserv-loki-reader test`
 - Refresh the flow logs: you should see traffic, limited to the allowed namespace.
 
 ## Troubleshooting
