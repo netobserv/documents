@@ -147,9 +147,9 @@ High availability can be implemented by using Kafka deployment model (e.g. with 
 
   * Describe the project’s resource requirements, including CPU, Network and Memory.
 
-Resource requirements highly depend on the cluster network topology: how many nodes and pods you have, how much traffic, etc. While eBPF ensures a minimal impact on workload performance, the generated network flows can represent a significant amount of data, which impact CPU, memory and bandwitdh. Some [recommendations](https://github.com/netobserv/network-observability-operator/blob/main/config/descriptions/ocp.md#resource-considerations) are provided, but your mileage may and will vary. Some statistics are documented [here](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/network_observability/configuring-network-observability-operators#network-observability-resource-recommendations_network_observability).
+Resource requirements highly depend on the cluster network topology: how many nodes and pods you have, how much traffic, etc. While eBPF ensures a minimal impact on workload performance, the generated network flows can represent a significant amount of data, which impact nodes CPU, memory and bandwitdh. Some [recommendations](https://github.com/netobserv/network-observability-operator/blob/main/config/descriptions/ocp.md#resource-considerations) are provided, but your mileage may and will vary. Some statistics are documented [here](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/network_observability/configuring-network-observability-operators#network-observability-resource-recommendations_network_observability).
 
-Mitigating high resource requirements can be done in several ways, such as by increasing the sampling interval, adding filters, or considering whether to use Loki or not. More information [here](https://github.com/netobserv/network-observability-operator/tree/main?tab=readme-ov-file#configuration).
+Mitigating high resource requirements can be done in several ways, such as by increasing the sampling interval, adding filters, or considering whether or not to use Loki. More information [here](https://github.com/netobserv/network-observability-operator/tree/main?tab=readme-ov-file#configuration).
 
   * Describe the project’s storage requirements, including its use of ephemeral and/or persistent storage.
 
@@ -208,6 +208,28 @@ Testing and validating the installation can be done by port-forwarding the web c
     * Describe how the project is handling certificate rotation and mitigates any issues with certificates.  
     * Describe how the project is following and implementing [secure software supply chain best practices](https://project.linuxfoundation.org/hubfs/CNCF\_SSCP\_v1.pdf) 
 -->
+- [Self assessment](./Security%20Self-Assessment.md)
+- On TAG Security whitepaper:
+1. Make security a design requirement
+Security measures have been baked in from GA day-0, and continuously improved over time. For instance, from day-0, TLS / mTLS has been recommended through Kafka; RBAC and multi-tenancy supported via the Loki Operator; eBPF agents, running with elevated privileges, are segregated in a different namespace; fine-grained capabilities are favored whenever possible. A threat modeling as been done internally at Red Hat.
+2. Applying secure configuration has the best user experience
+Security by default is preferred, although not always possible. Servers use TLS by default. eBPF agents run in non-privileged mode by default.
+Network policy is unfortunately not always installed by default, as it may blocks communications unexpectedly with some CNIs, but it does in OpenShift.
+3. Selecting insecure configuration is a conscious decision
+Features that require the eBPF agent privileged mode will not automatically enable it: it remains a conscious decision.
+4. Transition from insecure to secure state is possible
+All the configuration is managed through the Operator with a typical reconciliation, which ensures transitions work seemlessly, in one way or another.
+5. Secure defaults are inherited
+NetObserv does not override any known secure defaults.
+6. Exception lists have first class support
+N/A
+7. Secure defaults protect against pervasive vulnerability exploits.
+Containers run as non-root; Release pipeline includes vulnerability scans.
+8. Security limitations of a system are explainable
+While security limitations are not hidden, they may not be very visible. This is something to add to the roadmap.
+
+TBC
+
 
 ## Day 1 \- Installation and Deployment Phase
 
