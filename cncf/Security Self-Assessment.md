@@ -87,7 +87,7 @@ Additionally, NetObserv MUST NOT
 
 - Leak any network data or metadata to unauthorized users.
 - Cause any harm by being gamed when reading network packets (untrusted).
-- Allow connections from untrusted workloads to flowlogs-pipeline.
+- Allow connections from untrusted workloads to any ingest-side component, that could alter the data produced.
 
 ### Non-Goals
 
