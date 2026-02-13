@@ -28,9 +28,13 @@ When the OVN-Kubernetes CNI is detected, which is the default in OpenShift, a ne
   - Investigate on the network policy issues, make it work for some common CNIs.
   - Raise warnings / degrade conditions when no network policy is detected.
   - Better document the required ACLs for NetObserv, for users using CNIs that don't support the embedded policy.
+  - Document the risks associated to not having a network policy.
 - TLS / mTLS
   - Integrate Trust-manager resources in the Helm chart by default ([issue #2360](https://github.com/netobserv/network-observability-operator/issues/2360)).
   - Raise warnings / degrade conditions when no TLS is detected.
+  - Document the risks associated to disabling TLS.
+- Documentation review
+  - Review all the documentation to emphasize more the risks when relaxing the secured defaults (e.g.: privileged agent).
 
 #### Securing the upstream build and release processes
 
