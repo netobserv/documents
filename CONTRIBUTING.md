@@ -8,7 +8,7 @@ There should be mutual respect between contributors and maintainers.
 
 ### Security vulnerabilities
 
-Unlike other contributions, if you think you discovered a security vulnerability, please do not report it publicly or even fix it publicly. Please follow the instructions described on the [Red Hat Customer Portal](https://access.redhat.com/security/team/contact/?extIdCarryOver=true&sc_cid=701f2000001Css5AAC) instead.
+Unlike other contributions, if you think you discovered a security vulnerability, please do not report it publicly or even fix it publicly. Please follow the instructions described on the [Red Hat Customer Portal](https://access.redhat.com/security/team/contact/) instead.
 
 ### Documentation contributions
 
