@@ -44,7 +44,7 @@ No.
 
 ### Software Bill of Materials
 
-SBOM of downstream builds are publicly available (e.g. https://quay.io/repository/redhat-user-workloads/ocp-network-observab-tenant/network-observability-operator-ystream, see .sbom suffixed tags). While upstream builds don't have SBOM attached, they should be mostly identical, as upstream and downstream builds share the same code and base images. Minor differences should be expected though.
+SBOM of downstream builds are publicly available (e.g. https://quay.io/repository/redhat-user-workloads/ocp-network-observab-tenant/network-observability-operator-ystream, see .sbom suffixed tags). While upstream builds don't have SBOM attached, they should be mostly identical, as upstream and downstream builds share the same code and base images. Minor differences should be expected though. Adding SBOM to the upstream builds is part of the roadmap.
 
 ### Security Links
 
@@ -56,12 +56,12 @@ NetObserv is a set of components used to observe network traffic by generating N
 
 ### Background
 
-Kubernetes can be complex, and so does Kubernetes networking. Especially as it can differ from a CNI to another. Cluster admins often find important to have a good observability over the network, that clearly maps with Kubernetes resources (Services, Pods, Nodes...). This is what NetObserv aims to offer. Additionally, it aims at identifying network issues, and raising alerts. While it is not designed as a security tool, the data that it provides can be leveraged, for instance, to detect network threat patterns.
+Kubernetes is complex, and so is Kubernetes networking, especially since it can differ from one CNI to another. Cluster admins often find it important to have good observability over the network that clearly maps with Kubernetes resources (e.g. services, pods, nodes). This is what NetObserv aims to offer. Additionally, it aims at identifying network issues and raising alerts. While it is not designed as a security tool, the data that it provides can be leveraged, for instance, to detect network threat patterns. It is used for auditing purpose.
 
 ### Actors
 
 1. The [operator](https://github.com/netobserv/network-observability-operator), orchestrates the deployment of all related components (listed below), based on the supplied configuration. It operates at the cluster scope.
-2. The [eBPF agent](https://github.com/netobserv/flowlogs-pipeline) and [flowlogs-pipeline](https://github.com/netobserv/flowlogs-pipeline) are collecting network flows from the hosts (nodes), processing them, before sending them to storage or custom exporters.
+2. The [eBPF agent](https://github.com/netobserv/flowlogs-pipeline) and [flowlogs-pipeline](https://github.com/netobserv/flowlogs-pipeline) are extracting and collecting network flows from the hosts (nodes), processing them, before sending them to storage or custom exporters.
 3. The [web console](https://github.com/netobserv/network-observability-console-plugin) reads data from the stores to display dashboards.
 4. The [CLI](https://github.com/netobserv/network-observability-cli) is an independent piece that also starts the eBPF agents and flowlogs-pipeline for on-demand monitoring, from the command line.
 
@@ -69,7 +69,7 @@ Kubernetes can be complex, and so does Kubernetes networking. Especially as it c
 
 The operator reads the main configuration (FlowCollector CRD) to determine how to deploy and configure the related components.
 
-The eBPF agents are deployed, one per node (DaemonSet), with elevated privleges, load their eBPF payload in the host kernel, and start collecting network flows. Those flows are sent to flowlogs-pipeline, which correlate them with Kubernetes resources, and performs various transformations, before sending them to a log store (Loki) and/or expose them as Prometheus metrics. Other exporting options exist. Loki, Prometheus and any receiving system are not part of the NetObserv payload, they must be installed and managed separately.
+The eBPF agents are deployed, one per node (DaemonSet), with elevated privileges, load their eBPF payload in the host kernel, and start extracting network flows. Those flows are sent to flowlogs-pipeline, which correlates them with Kubernetes resources, and performs various transformations, before sending them to a log store (Loki) and/or expose them as Prometheus metrics. Other exporting options exist. Loki, Prometheus and any receiving system are not part of the NetObserv payload. They must be installed and managed separately.
 
 Optionally, Apache Kafka can be used as an intermediate between the eBPF agents and flowlogs-pipeline.
 
@@ -86,7 +86,7 @@ In terms of security, because the NetObserv operator has cluster-wide access to 
 Additionally, NetObserv MUST NOT
 
 - Leak any network data or metadata to unauthorized users.
-- Cause any harm by being gamed when reading network packets (untrusted).
+- Cause any harm by being gamed when reading network packets (untrusted input).
 - Allow connections from untrusted workloads to any ingest-side component, that could alter the data produced.
 
 ### Non-Goals
@@ -106,15 +106,19 @@ This document provides NetObserv maintainers and stakeholders with additional co
 | Component                 | Applicability    | Description of Importance                                                         |
 | ------------------------- | ---------------- | --------------------------------------------------------------------------------- |
 | Namespace segregation     | Critical         | For hardened security, the components that require elevated privileges are deployed in their own namespace, flagged as privileged, that should be only accessible by cluster admins. |
+| TLS version restriction   | Critical         | When TLS is used, minimum version is forced to 1.3. |
 | Non-root eBPF agents      | SecurityRelevant | Whenever possible, the eBPF agents run with fine-grained privileges (e.g. CAP_BPF) instead of full privileges. Some features, however, do require full privileges. |
-| Network policies          | SecurityRelevant | A network policy can be installed automatically to better isolate the communications of the NetObserv workloads. However, due to policies being somewhat CNI-dependent and the inherent risk of breaking communications with untested CNIs, this feature is not enabled by default, except in OpenShift. |
-| Encrypted traffic         | SecurityRelevant | All servers are configured with TLS by default. |
+| Unprivileged eBPF agents  | SecurityRelevant | Using bpfman (a CNCF project) allows to run agents without privileges. Operations requiring elevated privileges are delegated to bpfman. |
+| Network policies          | SecurityRelevant | A network policy can be installed automatically to better isolate the communications of the NetObserv workloads. However, due to policies being somewhat CNI-dependent and the inherent risk of breaking communications with untested CNIs, this feature is not enabled by default, except with OVN-Kubernetes. |
+| Encrypted traffic         | SecurityRelevant | All servers are configured with TLS by default. In OpenShift, certificates are generated automatically. Else, they must be provided by the users. |
 | Authorized traffic (mTLS) | SecurityRelevant | Traffic between the eBPF agents and flowlogs-pipeline can be authorized on both sides (mTLS) when using with Kafka. It is planned to bring mTLS to other modes, without Kafka. When not using mTLS, it is highly recommended to protect the netobserv namespace with a network policy. |
 | RBAC-enforced stores      | SecurityRelevant | Multi-tenancy can be achieved when supported by the backend stores: e.g. Loki with the Loki Operator, Prometheus with Thanos. In that case, NetObserv can be configured to forward user tokens. |
 
 ## Project Compliance
 
-N/A: the project has not been evaluated against compliance standards as of today.
+Downstream builds are FIPS-140 compliant. Those build recipes are open-source and can be replicated.
+
+The project has not been evaluated against other compliance standards as of today.
 
 ### Future State
 
@@ -140,11 +144,11 @@ In order to secure the SDLC from development to deployment, the following measur
 - Code owners need to have 2FA enabled.
 - Vulnerabilities in dependencies, and dependency upgrades, are managed via Dependabot and Renovate.
 - Some weaknesses are reported by linters (golangci-lint, eslint).
-  - `govulncheck` use to be added to the roadmap.
+  - `govulncheck` usage is [in the roadmap](./roadmap.md).
 - Downstream release process is automated.
   - It includes vulnerability scans, FIPS-compliance checks, immutable images, SBOM, signing.
 - Upstream release process is partly automated (the helm chart bundling is not, at this time).
-  - More security measures to be added to the roadmap.
+  - Improvement are listed [in the roadmap](./roadmap.md).
 
 ### Communication Channels
 
@@ -155,7 +159,7 @@ In order to secure the SDLC from development to deployment, the following measur
 
 ## Security Issue Resolution
 
-As a Red Hat product, security issues and procedures are described on the [Security Contacts and Procedures](https://access.redhat.com/security/team/contact/?extIdCarryOver=true&sc_cid=701f2000001Css5AAC) page.
+As a Red Hat product, security issues and procedures are described on the [Security Contacts and Procedures](https://access.redhat.com/security/team/contact/) page. The GitHub repositories have a SECURITY.md file where reporters can find this information.
 
 ### Responsible Disclosure Practice
 
@@ -170,9 +174,9 @@ Patches will be made to the `main` and the latest release branches, and new rele
 ## Appendix
 
 - Known Issues Over Time
-  - Known issues are currently tracked in the project roadmap. There are currently no known vulnerabilities in the current supported version.
+  - Known issues are currently tracked in the [project roadmap](./roadmap.md). There are currently no known vulnerabilities in the current supported version.
 - OpenSSF Best Practices
-  - The process to get a Best Practices badge is not yet on the roadmap.
+  - The process to get a Best Practices badge is not currently on the roadmap.
 - Case Studies
   - TBC
 - Related Projects / Vendors

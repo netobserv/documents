@@ -23,7 +23,7 @@ These questions are to gather knowledge about the project. Project maintainers a
 - **Template Version:** v1.0
 - **Description:** <!-- Short project description --> 
 
-NetObserv is a set of components used to observe network traffic by generating NetFlows from eBPF agents with zero-instrumentation, enriching those flows using a Kubernetes-aware configurable pipeline, exporting them in various ways (logs, metrics, Kafka, IPFIX...), and finally providing a comprehensive visualization tool for making sense of that data, a network health dashboard, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator, although they can also be used as standalones.
+NetObserv is a set of components used to observe network traffic by generating NetFlows from eBPF agents with zero-instrumentation, enriching those flows using a Kubernetes-aware configurable pipeline, exporting them in various ways (to Loki, Prometheus, Kafka, OpenTelemetry or IPFIX), providing a comprehensive web UI for visualization, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator, although they can also be used as standalones.
 
 The enriched NetFlows consist of basic 5-tuples information (IPs, ports…), metrics (bytes, packets, drops, latency…), kube metadata (pods, namespaces, services, owners), cloud data (zones), CNI data (network policy events), DNS (codes, qname) and more.
 
@@ -42,7 +42,7 @@ NetObserv is largely CNI-agnostic, although some specific features can relate to
 
 NetObserv is the upstream of Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index) for OpenShift. As such, a large part of the roadmap comes from the requirements on that downstream product, while it benefits equally to the upstream (there are no downstream-only features).
 
-TBC...
+While the downstream product is considered today *production-ready*, that is not the case of the upstream project however. We have created [a specific roadmap](./roadmap.md) to address the known issues in the upstream project, and eventually fill the gap for production readiness.
 
   * Describe the target persona or user(s) for the project?
 
@@ -120,6 +120,8 @@ Both the NetObserv operator and the `flowlogs-pipeline` component interact with 
 As mentioned before, NetObserv has dependencies on Loki and Prometheus. NetObserv does not install any of them, they must be installed separately (except for Loki when configured in "demo" mode). The provided helm chart includes those dependencies as optional, to simplify the installation, but they remain unmanaged. It is not required to use Loki though, it can be disabled in configuration, in which case NetObserv relies solely on Prometheus metrics, but losing precision in the process (data in Prometheus is more aggregated).
 
 Optionally, Kafka can be used at a pre-ingestion stage for a production-grade, high-availability deployment (e.g, using Strimzi).
+
+Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By doing so, the highly privileged operations, such as loading bpf programs in the kernel, are delegated to bpfman. It allows to run the eBPF agent unprivileged.
 
 Finally, several services require TLS certificates, which are generally provided by cert-manager or OpenShift Service Certificates.
 
@@ -226,7 +228,7 @@ N/A
 7. Secure defaults protect against pervasive vulnerability exploits.
 Containers run as non-root; Release pipeline includes vulnerability scans.
 8. Security limitations of a system are explainable
-While security limitations are not hidden, they may not be very visible. This is something to add to the roadmap.
+While security limitations are not hidden, they may not be very visible. This is something added [to the roadmap](./roadmap.md).
 
 TBC
 
