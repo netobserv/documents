@@ -145,6 +145,7 @@ In order to secure the SDLC from development to deployment, the following measur
 - Vulnerabilities in dependencies, and dependency upgrades, are managed via Dependabot and Renovate.
 - Some weaknesses are reported by linters (golangci-lint, eslint).
   - `govulncheck` usage is [in the roadmap](./roadmap.md).
+- The maintainers team has access to a snyk dashboard.
 - Downstream release process is automated.
   - It includes vulnerability scans, FIPS-compliance checks, immutable images, SBOM, signing.
 - Upstream release process is partly automated (the helm chart bundling is not, at this time).

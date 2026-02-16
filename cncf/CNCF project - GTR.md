@@ -174,13 +174,15 @@ The project configuration is designed to work well with minimal configuration. T
 
 The default configuration is designed to work well on small/mid-sized clusters, ie. between roughly 5 and 50 nodes, with a default sampling interval set to 50 in order to preserve resource usage (as opposed to an interval of 1, which would capture all the traffic). On bigger cluster topologies, it is recommended to optimize carefully.
 
-Best effort is done to achieve security by default, but this is sometimes too dependent on the environment. For instance, while a network policy is installed by default in OpenShift, it is not when running in a different environment, as this may break with some CNIs. In that case, enabling the network policy must be done explicitely, or the user can configure their own policy.
+Best effort is done to achieve security by default, but this is sometimes too dependent on the environment. For instance, while a network policy is installed by default in OpenShift with OVN-Kubernetes, it is not when running in a different environment, as this may break with some CNIs. In that case, enabling the network policy must be done explicitely, or the user can configure their own policy.
 
 Loki must be configured accordingly to its installation, disabled, or enabled in "demo" mode. Prometheus querier URL must be configured. It is recommended to enable the embedded network policy, or to install one. In OpenShift, Prometheus and the network policy are enabled and configured automatically.
 
+<!--
   * Describe any new or changed API types and calls \- including to cloud providers \- that will result from this project being enabled and used  
   * Describe compatibility of any new or changed APIs with API servers, including the Kubernetes API server   
   * Describe versioning of any new or changed APIs, including how breaking changes are handled
+-->
 
 The project release process is split between upstream and downstream releases. For both of them, content can be tracked from the repositories, which are public.
 
@@ -224,13 +226,17 @@ While security limitations are not hidden, they may not be very visible. This is
 
 **How do you recommend users alter security defaults in order to "loosen" the security of the project? Please link to any documentation the project has written concerning these use cases.**
 
-We are not currently emphasizing the security risks associated with relaxing the default settings. This is something to improve.
+We are not currently emphasizing the security risks associated with relaxing the default settings. This is something we [plan to improve](./roadmap.md).
 
 **Security Hygiene**
-<!-- 
-    * Please describe the frameworks, practices and procedures the project uses to maintain the basic health and security of the project.   
-    * Describe how the project has evaluated which features will be a security risk to users if they are not maintained by the project?  
--->
+
+We use SAST and DAST frameworks to maintain basic health and security:
+
+- The project uses GitHub pull requests for all contributions, configured with branch protections, enforced 2FA, required approvals, and CI job checks.
+  - CI jobs include compiling, linting, image-building and automated tests.
+- The maintainers team has access to a snyk dashboard.
+- A combination of dependabot and renovate is used to track outdated dependencies.
+- Vulnerabilities in dependencies are reported using GitHub security advisories, as well as Clair.
 
 **Cloud Native Threat Modeling**
 <!-- 
