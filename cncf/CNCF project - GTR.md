@@ -74,7 +74,7 @@ Unfortunately there is no such kind of end user research publicly available.
 
 **How should the target personas interact with your project?**
 
-Configuration is done entirely through the CRD APIs, managed by an k8s operator. It is gitops-friendly. A web console is provided for the network traffic and network health visualization. Metrics and alerts are provided for Prometheus, meaning that the users can leverage their existing tooling if they already have it. A command-line interface tool is also provided, independently from the operator, allowing users to troubleshoot network from the command line.
+Configuration is done entirely through the CRD APIs, managed by a k8s operator. It is gitops-friendly. A web console is provided for the network traffic and network health visualization. Metrics and alerts are provided for Prometheus, meaning that the users can leverage their existing tooling if they already have it. A command-line interface tool is also provided, independently from the operator, allowing users to troubleshoot network from the command line.
 
 **Describe the user experience (UX) and user interface (UI) of the project.**
 
@@ -101,7 +101,7 @@ In the future, we may investigate other UI integration, such as with Headlamp.
 
 ### Design
 
-  **Explain the design principles and best practices the project is following.**
+**Explain the design principles and best practices the project is following.**
 
 The project design principles and best practices are globally common to many Red Hat products. The development philosophy is "upstream first", meaning that there is no hidden code/feature that only downstream users would get. In fact, there is even no specific repository for downstream.
 
@@ -111,11 +111,11 @@ We expect a reasonably high code quality standard, without being too picky on st
 
 All architectural decisions are made with care, and must be well balanced according to their drawbacks. When that happens, we expect to discuss a list of pros and cons thoughtfully. One aspect that is often overlooked at first is the impact on the maintenance and support workloads.
 
-  **Outline or link to the project’s architecture requirements? Describe how they differ for Proof of Concept, Development, Test and Production environments, as applicable.**
+**Outline or link to the project’s architecture requirements? Describe how they differ for Proof of Concept, Development, Test and Production environments, as applicable.**
 
-??
 
-  **Define any specific service dependencies the project relies on in the cluster.**
+
+**Define any specific service dependencies the project relies on in the cluster.**
 
 Both the NetObserv operator and the `flowlogs-pipeline` component interact with the Kube API server to watch resources and, for the operator, to create or update them.
 
@@ -127,39 +127,39 @@ Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By 
 
 Finally, several services require TLS certificates, which are generally provided by cert-manager or OpenShift Service Certificates.
 
-  **Describe how the project implements Identity and Access Management.**
+**Describe how the project implements Identity and Access Management.**
 
 On the ingestion side, there is no Identity and Access Management other than with the components service accounts themselves, associated with RBAC permissions.
 
 On the consuming side, NetObserv does not implement by itself Identity and Access Management, however all queries run against Loki or Prometheus forward the Authorization header, delegating this aspect to those backends. In a production-grade environment, Thanos and the Loki Operator can be used to enable multi-tenancy. This is how it is implemented in OpenShift.
 
-  **Describe how the project has addressed sovereignty.**
+**Describe how the project has addressed sovereignty.**
 
-Open-source addresses independence.
+Open-source addresses independence. Being a vendor-neutral CNCF sandbox project would reinforce it.
 
 NetObserv does not store any data directly, this is delegated to Loki and/or Prometheus and the aforementioned exporting methods. All these options offer a very decent flexibility in terms of storage options, with interoperability, which should not cause any independence blockers.
 
-  **Describe any compliance requirements addressed by the project.**
+**Describe any compliance requirements addressed by the project.**
 
 Downstream builds are FIPS-140 compliant. Those build recipes are open-source and can be replicated.
 
 The project has not been evaluated against other compliance standards as of today.
 
-  **Describe the project’s High Availability requirements.**
+**Describe the project’s High Availability requirements.**
 
 High availability can be implemented by using Kafka deployment model (e.g. with Strimzi), and using an autoscaler for the `flowlogs-pipeline` component. Loki and Prometheus should be configured for high availability as well (this aspect is not managed by NetObserv itself; using Thanos and the Loki Operator can serve this purpose).
 
-  **Describe the project’s resource requirements, including CPU, Network and Memory.**
+**Describe the project’s resource requirements, including CPU, Network and Memory.**
 
 Resource requirements highly depend on the cluster network topology: how many nodes and pods you have, how much traffic, etc. While eBPF ensures a minimal impact on workload performance, the generated network flows can represent a significant amount of data, which impact nodes CPU, memory and bandwitdh. Some [recommendations](https://github.com/netobserv/network-observability-operator/blob/main/config/descriptions/ocp.md#resource-considerations) are provided, but your mileage may and will vary. Some statistics are documented [here](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/network_observability/configuring-network-observability-operators#network-observability-resource-recommendations_network_observability).
 
 Mitigating high resource requirements can be done in several ways, such as by increasing the sampling interval, adding filters, or considering whether or not to use Loki. More information [here](https://github.com/netobserv/network-observability-operator/tree/main?tab=readme-ov-file#configuration).
 
-  **Describe the project’s storage requirements, including its use of ephemeral and/or persistent storage.**
+**Describe the project’s storage requirements, including its use of ephemeral and/or persistent storage.**
 
 Storage is not directly managed by NetObserv, and is to be configured via Prometheus and/or Loki. TTL is important to consider. Loki is often configured with a S3 backend storage, but other options exist, such as ODF. Just like memory, storage requirements highly depend on the cluster network topology, and can be mitigated the same way as mentioned above.
 
-  **Please outline the project’s API Design:**
+**Please outline the project’s API Design:**
 
 NetObserv defines several APIs:
 - The [FlowCollector CRD](https://github.com/netobserv/network-observability-operator/blob/main/docs/FlowCollector.md) contains the main, cluster-wide configuration for NetObserv.
