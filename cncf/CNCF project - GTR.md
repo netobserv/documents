@@ -38,35 +38,39 @@ NetObserv is largely CNI-agnostic, although some specific features can relate to
 
 ### Scope
 
-  **Describe the roadmap process, how scope is determined for mid to long term features, as well as how the roadmap maps back to current contributions and maintainer ladder?**
+**Describe the roadmap process, how scope is determined for mid to long term features, as well as how the roadmap maps back to current contributions and maintainer ladder?**
 
-NetObserv is the upstream of Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index) for OpenShift. As such, a large part of the roadmap comes from the requirements on that downstream product, while it benefits equally to the upstream (there are no downstream-only features).
+NetObserv is the upstream of Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index) for OpenShift. As such, today a large part of the roadmap comes from the requirements on that downstream product; but most of the time, it benefits equally to the upstream (there are no downstream-only features; even OpenShift-related features are actually relevant with upstream OKD). To take an example, while TLS & QUIC traffic observability is in the downstream roadmap, it will benefit to all users (and its development actually involves external contributions).
 
-While the downstream product is considered today *production-ready*, that is not the case of the upstream project however. We have created [a specific roadmap](./roadmap.md) to address the known issues in the upstream project, and eventually fill the gap for production readiness.
+The other way around, there are features added from community request, that may or may not be considered part of the downstream product (not documented as such).
 
-  **Describe the target persona or user(s) for the project?**
+If NetObserv becomes a CNCF project, we expect a more balanced situation between upstream and downstream roadmaps.
+
+Regarding the current content of the [community roadmap](./roadmap.md): while the downstream product is considered today *production-ready*, that is not totally the case of the upstream project. The current goal is to address the known issues in the upstream project, to eventually fill that gap.
+
+**Describe the target persona or user(s) for the project?**
 
 The project targets both cluster administrators and project teams. Cluster administrators have a cluster-wide view over all the network traffic, full topology, access to metrics and alerts. They can run packet-capture, they configure the cluster-scoped flow collection process.
 
 Through multi-tenancy, project teams have access to a subset of the traffic and the related topology. They have limited configuration options, such as per-namespace sampling or traffic flagging.
 
-  **Explain the primary use case for the project. What additional use cases are supported by the project?**
+**Explain the primary use case for the project. What additional use cases are supported by the project?**
 
 Observing the network runtime traffic with different levels of granularity and aggregations, receiving network health info such as saturation, degraded latency, DNS issues, etc. Troubleshooting network issues, narrowing down to specific pods or services, deep-diving in netflow data or pcap. Being alerted.
 
 With OVN-Kubernetes CNI, network policy troubleshooting, and network isolation (UDN) visualization.
 
-  **Explain which use cases have been identified as unsupported by the project.**
+**Explain which use cases have been identified as unsupported by the project.**
 
-Currently, network policy troubleshooting with other CNI than OVN-Kubernetes are not supported.
+Currently, network policy troubleshooting with other CNI than OVN-Kubernetes are not supported, but this is precisely where an increased community adoption could drive enhancements.
 
 L7 observability not planned to this date (no insight into http specific data such as error codes or URLs; NetObserv operates at a lower level).
 
-  **Describe the intended types of organizations who would benefit from adopting this project. (i.e. financial services, any software manufacturer, organizations providing platform engineering services)?**
+**Describe the intended types of organizations who would benefit from adopting this project. (i.e. financial services, any software manufacturer, organizations providing platform engineering services)?**
 
 All types of organizations may benefit from network observability.
 
-  **Please describe any completed end user research and link to any reports.**
+**Please describe any completed end user research and link to any reports.**
 
 Unfortunately there is no such kind of end user research publicly available.
 
