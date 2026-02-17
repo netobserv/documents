@@ -55,3 +55,7 @@ Downstream builds and releases use an entirely different workflow that is common
   - Sign images
   - Make releases immutable
   - Automate the Helm chart generation
+
+#### Refactoring of the CRD docs
+
+The CRD docs are currently opinionated towards OpenShift with the "Unsupported" mentions, which refers to *downstream support*. It should be refactored to remove these mentions, and find a vendor-neutral mechanism to convey the desired information in downstream docs.
