@@ -144,12 +144,11 @@ In order to secure the SDLC from development to deployment, the following measur
 - Code owners need to have 2FA enabled.
 - Vulnerabilities in dependencies, and dependency upgrades, are managed via Dependabot and Renovate.
 - Some weaknesses are reported by linters (golangci-lint, eslint).
-  - `govulncheck` usage is [in the roadmap](./roadmap.md).
 - The maintainers team has access to a snyk dashboard.
 - Downstream release process is automated.
   - It includes vulnerability scans, FIPS-compliance checks, immutable images, SBOM, signing.
 - Upstream release process is partly automated (the helm chart bundling is not, at this time).
-  - Improvement are listed [in the roadmap](./roadmap.md).
+  - Improvement are listed [in the roadmap](https://github.com/netobserv/network-observability-operator/issues/2490).
 
 ### Communication Channels
 
@@ -175,7 +174,7 @@ Patches will be made to the `main` and the latest release branches, and new rele
 ## Appendix
 
 - Known Issues Over Time
-  - Known issues are currently tracked in the [project roadmap](./roadmap.md). There are currently no known vulnerabilities in the current supported version.
+  - Known issues are currently tracked in the [project roadmap](https://github.com/orgs/netobserv/projects/1/views/1). There are currently no known vulnerabilities in the current supported version.
 - OpenSSF Best Practices
   - The process to get a Best Practices badge is not currently on the roadmap.
 - Case Studies

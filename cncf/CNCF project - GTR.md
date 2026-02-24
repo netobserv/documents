@@ -40,13 +40,21 @@ NetObserv is largely CNI-agnostic, although some specific features can relate to
 
 **Describe the roadmap process, how scope is determined for mid to long term features, as well as how the roadmap maps back to current contributions and maintainer ladder?**
 
-NetObserv is the upstream of Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index) for OpenShift. As such, today a large part of the roadmap comes from the requirements on that downstream product; but most of the time, it benefits equally to the upstream (there are no downstream-only features; even OpenShift-related features are actually relevant with upstream OKD). To take an example, while TLS & QUIC traffic observability is in the downstream roadmap, it will benefit to all users (and its development actually involves external contributions).
+NetObserv has an upstream project and, currently, one known downstream/vendor product, which is Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index), for OpenShift.
 
-The other way around, there are features added from community request, that may or may not be considered part of the downstream product (not documented as such).
+There is a high level [Kanban board](https://github.com/orgs/netobserv/projects/1/views/1) that lists the requested / accepted features upstream and tracks progress on them.
 
-If NetObserv becomes a CNCF project, we expect a more balanced situation between upstream and downstream roadmaps.
+Most of the maintainers (not all) work in parallel on the downstream product, but it must be noted that, most of the time, this work benefits equally to the upstream: there are pratically no downstream-only features, or very few. To take an example, while TLS & QUIC traffic observability is in the downstream roadmap, it will benefit to all users (and its development actually involves external contributions). So the question is less about how much work the maintainers team is doing for the upstream, than how to make it visible in the community roadmap. The main upstream+downstream features are mirrored in the Kanban board.
 
-Regarding the current content of the [community roadmap](./roadmap.md): while the downstream product is considered today *production-ready*, that is not totally the case of the upstream project. The current goal is to address the known issues in the upstream project, to eventually fill that gap.
+That said, there are also upstream-only features that are planned, and bugs fixes. The maintainers work regularly on them, often driven by the community interactions, either on Slack or on GitHub. It is nothing exceptional at Red Hat to have dedicated time for communities and upstream work. External contributions are welcome as well.
+
+As of 2026, the biggest gap identified between upstream and downstream is production readiness: while the downstream product is considered today *production-ready*, that is not totally the case of the upstream project. It is our current main focus on the project. This includes:
+
+- Secured defaults: [using TLS by default in the Helm install](https://github.com/netobserv/network-observability-operator/issues/2360).
+- Secured defaults: [increase cases of default-installed netpol](https://github.com/netobserv/network-observability-operator/issues/2491).
+- Upstream release process: [implement best practices](https://github.com/netobserv/network-observability-operator/issues/2490).
+
+This work is in progress.
 
 **Describe the target persona or user(s) for the project?**
 
@@ -99,9 +107,11 @@ NetObserv can generate many metrics, ingested by Prometheus, and alerting rules 
 
 For comprehensive observability, NetObserv can also send the network flows to Grafana Loki, and/or export them to other systems by different means: using the IPFIX standard, or the OpenTelemetry protocol (as logs or as metrics), or to a Kafka broker. Those exporting options allow to integrate with many different systems (Splunk, ElasticSearch, etc.)
 
-In OpenShift, the web console comes as a plugin for the OpenShift Console, ensuring a smooth integration.
+As mentioned above, NetObserv leverages some features of OVN-Kubernetes, such as its Observability mode, and User-Defined Networks.
 
-In the future, we may investigate other UI integration, such as with Headlamp.
+Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By doing so, the highly privileged operations, such as loading bpf programs in the kernel, are delegated to bpfman. It allows to run the eBPF agent unprivileged.
+
+In OpenShift / OKD, the web console comes as a plugin for the product console, ensuring a smooth integration. There could be a similar vendor-neutral integration, such as with Headlamp.
 
 ### Design
 
@@ -127,15 +137,13 @@ As mentioned before, NetObserv has dependencies on Loki and Prometheus. NetObser
 
 Optionally, Kafka can be used at a pre-ingestion stage for a production-grade, high-availability deployment (e.g, using Strimzi).
 
-Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By doing so, the highly privileged operations, such as loading bpf programs in the kernel, are delegated to bpfman. It allows to run the eBPF agent unprivileged.
-
-Finally, several services require TLS certificates, which are generally provided by cert-manager or OpenShift Service Certificates.
+Finally, several services require TLS certificates, which by default are provided by cert-manager.
 
 **Describe how the project implements Identity and Access Management.**
 
 On the ingestion side, there is no Identity and Access Management other than with the components service accounts themselves, associated with RBAC permissions.
 
-On the consuming side, NetObserv does not implement by itself Identity and Access Management, however all queries run against Loki or Prometheus forward the Authorization header, delegating this aspect to those backends. In a production-grade environment, Thanos and the Loki Operator can be used to enable multi-tenancy. This is how it is implemented in OpenShift.
+On the consuming side, NetObserv does not implement by itself Identity and Access Management, however, when deployed as a plugin, all queries run against Loki or Prometheus forward the Authorization header, delegating this aspect to those backends. In a production-grade environment, Thanos and the Loki Operator can be used to enable multi-tenancy.
 
 **Describe how the project has addressed sovereignty.**
 
@@ -172,15 +180,15 @@ NetObserv defines several APIs:
 - The [flows format reference](https://github.com/netobserv/network-observability-operator/blob/main/docs/flows-format.adoc) describes the structure and content of a network flow, which can be consumed in various ways.
 - Additionally, [there is some documentation](https://github.com/netobserv/network-observability-operator/blob/main/docs/HealthRules.md#creating-your-own-rules-that-contribute-to-the-health-dashboard) on how users can leverage the Network Health dashboard with customized metrics and alerts, involving some less formal API.
 
-The project CRDs follow standard Kubernetes API conventions as well as the OpenShift ones as best effort. Deviating from them is not impossible but must be argumented.
+The project CRDs follow standard Kubernetes API conventions as well as the OpenShift ones as a best effort. Deviating from them is not impossible but must be argumented.
 
-The project configuration is designed to work well with minimal configuration. This is especially true in OpenShift, thanks to its opinionated nature, but less true in other environments.
+The project configuration is designed to work well with minimal configuration. There is currently a gap on that matter between the upstream project and the downstream product, which we are aiming to minimize.
 
 The default configuration is designed to work well on small/mid-sized clusters, ie. between roughly 5 and 50 nodes, with a default sampling interval set to 50 in order to preserve resource usage (as opposed to an interval of 1, which would capture all the traffic). On bigger cluster topologies, it is recommended to optimize carefully.
 
-Best effort is done to achieve security by default, but this is sometimes too dependent on the environment. For instance, while a network policy is installed by default in OpenShift with OVN-Kubernetes, it is not when running in a different environment, as this may break with some CNIs. In that case, enabling the network policy must be done explicitely, or the user can configure their own policy.
+Best effort is done to achieve security by default, but this is sometimes too dependent on the environment. For instance, while a network policy is installed by default when OVN-Kubernetes is detected, it is not when running in a different environment, as this may break with some CNIs. In that case, enabling the network policy must be done explicitely, or the user can configure their own policy.
 
-Loki must be configured accordingly to its installation, disabled, or enabled in "demo" mode. Prometheus querier URL must be configured. It is recommended to enable the embedded network policy, or to install one. In OpenShift, Prometheus and the network policy are enabled and configured automatically.
+Loki must be configured accordingly to its installation, disabled, or enabled in "demo" mode. Prometheus querier URL must be configured. It is recommended to enable the embedded network policy, or to install one.
 
 <!--
   * Describe any new or changed API types and calls \- including to cloud providers \- that will result from this project being enabled and used  
@@ -191,8 +199,6 @@ Loki must be configured accordingly to its installation, disabled, or enabled in
 The project release process is split between upstream and downstream releases. For both of them, content can be tracked from the repositories, which are public.
 
 Upstream releases happen from the `main` branches without a well-defined cadence. They use GitHub workflows to generate images and artifacts, triggered by git tags. Versions are suffixed with `-community`, e.g. `v1.11.0-community`. A helm chart is manually updated after each component is released. The release process is described [here](https://github.com/netobserv/network-observability-operator/blob/main/RELEASE.md).
-
-Downstream releases happen from release branches (e.g. `release-1.11`) and use Konflux / Tekton. They produce an OLM bundle and OLM catalog fragments. They are loosely aligned with OpenShift releases.
 
 Versioning upstream and downstream is aligned on "major.minor", but not necessarily on ".patch". For instance, downstream `v1.2.3` and `v1.2.3-community` should have the same features (in `1.2`) but not necessarily the same fixes/patches (in `.3`).
 
@@ -214,7 +220,7 @@ Testing and validating the installation can be done by port-forwarding the web c
 Security measures have been baked in from GA day-0, and continuously improved over time. For instance, from day-0, TLS / mTLS has been recommended through Kafka; RBAC and multi-tenancy supported via the Loki Operator; eBPF agents, running with elevated privileges, are segregated in a different namespace; fine-grained capabilities are favored whenever possible. A threat modeling as been done internally at Red Hat.
 2. Applying secure configuration has the best user experience
 Security by default is preferred, although not always possible. Servers use TLS by default. eBPF agents run in non-privileged mode by default.
-Network policy is unfortunately not always installed by default, as it may blocks communications unexpectedly with some CNIs, but it does in OpenShift.
+Network policy is unfortunately not always installed by default, as it may blocks communications unexpectedly with some CNIs, but it does with OVN-Kubernetes.
 3. Selecting insecure configuration is a conscious decision
 Features that require the eBPF agent privileged mode will not automatically enable it: it remains a conscious decision.
 4. Transition from insecure to secure state is possible
@@ -226,11 +232,11 @@ N/A
 7. Secure defaults protect against pervasive vulnerability exploits.
 Containers run as non-root; Release pipeline includes vulnerability scans.
 8. Security limitations of a system are explainable
-While security limitations are not hidden, they may not be very visible. This is something added [to the roadmap](./roadmap.md).
+While security limitations are not hidden, they may not be very visible. This is something added [to the roadmap](https://github.com/netobserv/network-observability-operator/issues/2491).
 
 **How do you recommend users alter security defaults in order to "loosen" the security of the project? Please link to any documentation the project has written concerning these use cases.**
 
-We are not currently emphasizing the security risks associated with relaxing the default settings. This is something we [plan to improve](./roadmap.md).
+We are not currently emphasizing the security risks associated with relaxing the default settings. This is something we [plan to improve](https://github.com/netobserv/network-observability-operator/issues/2495).
 
 **Security Hygiene**
 
@@ -341,7 +347,7 @@ From the 4 components part of the operator (eBPF agent, flowlogs-pipeline, the w
 - Messages / events counters.
 - Some histograms tracking operation latency.
 
-In OpenShift, a Health dashboard is provided to track the most meaningful metrics, alongside with more general ones (CPU, memory, file descriptors, goroutines...). For non-OpenShift, a similar dashboard could be created.
+In OpenShift, a Health dashboard is provided to track the most meaningful metrics, alongside with more general ones (CPU, memory, file descriptors, goroutines...). There could be a vendor-neutral version of that dashboard.
 
 Two Prometheus alerting rules are created, to detect the absence of flows: one for flows received by flowlogs-pipeline, the other for flows written to Loki. Those alerts fire when something prevents NetObserv from running normally.
 
