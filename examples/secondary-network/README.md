@@ -1,5 +1,9 @@
 # Testing secondary networks (easily)
 
+OpenShift doc:
+
+- [Multiple networks](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html-single/multiple_networks/index#understanding-multiple-networks-con_understanding-multiple-networks)
+
 No need for a bare-metal cluster and VMs. Using cloud-based + ovn-k overlay l2 works just fine.
 
 We'll use here an example with mesh-arena.
