@@ -117,7 +117,7 @@ PING fe80::c8e1:ceff:feb2:6880%net1 (fe80::c8e1:ceff:feb2:6880%3): 56 data bytes
 7. Check in NetObserv
 
 Install NetObserv - don't forget to set up privileged agents in order to get 2dary interfaces.
-Also, when trying to find your ping traffic by filtering on protocol, remember this: ping on IPv6 uses ICMP_v6, not ICMP.
+Also, when trying to find your ping traffic by filtering on protocol, remember this: ping on IPv6 uses IPv6-ICMP, not ICMP.
 
 ## Troubleshooting
 
