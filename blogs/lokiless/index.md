@@ -42,7 +42,7 @@ For simplicity, ClickHouse is deployed locally and [ktunnel](https://github.com/
 ### Prerequisites
 
 - An OpenShift or Kubernetes cluster
-- [NetObserv operator](https://github.com/netobserv/network-observability-operator) installed (do not install a `FlowCollector` yet).
+- [NetObserv operator](https://github.com/netobserv/netobserv-operator) installed (do not install a `FlowCollector` yet).
 - ClickHouse binary: grab it as explained in their [quick install guide](https://clickhouse.com/docs/en/install#quick-install).
 - [ktunnel](https://github.com/omrikiei/ktunnel) binary.
 - Some common tools such as `curl`, `kubectl`, `envsubst`...
@@ -83,7 +83,7 @@ It creates a `clickhouse` service in the `default` namespace, bridged to your lo
 
 ### Prepare Kafka
 
-The steps here are very similar to the [Kafka deployment script](https://github.com/netobserv/network-observability-operator/blob/release-1.4/.mk/development.mk#L54-L63) that we use in NetObserv for development and testing purposes. They use [Strimzi](https://strimzi.io/) - the upstream of AMQ Streams for OpenShift - to get Kafka in the cluster, and a topic named "flows-export" is pre-created. 
+The steps here are very similar to the [Kafka deployment script](https://github.com/netobserv/netobserv-operator/blob/release-1.4/.mk/development.mk#L54-L63) that we use in NetObserv for development and testing purposes. They use [Strimzi](https://strimzi.io/) - the upstream of AMQ Streams for OpenShift - to get Kafka in the cluster, and a topic named "flows-export" is pre-created. 
 
 ```bash
 # Create a namespace for all the deployments
@@ -281,4 +281,4 @@ We could also investigate other storage options. But as you can imagine, maintai
 
 Finally, if you feel inspired by this flow consumer app, but you would expect something directly usable out of the box, production-ready... Then, why not collaborate in the open? We would love to see open-source contributions on this field. We could for instance create new repositories for community-maintained connectors, hosted on NetObserv's GitHub, and would of course provide all the help and expertise that we can, if there is demand for that.
 
-Any other ideas, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/network-observability-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/network-observability-operator/discussions/438).
+Any other ideas, or something to say? Don't hesitate to comment or ask questions on [our discussion board](https://github.com/netobserv/netobserv-operator/discussions)! A thread has been created specifically for this blog post: [here](https://github.com/netobserv/netobserv-operator/discussions/438).

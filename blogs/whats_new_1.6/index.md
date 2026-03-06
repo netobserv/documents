@@ -85,7 +85,7 @@ To generate flows (or not generate flows) for very specific data, you can specif
         protocol: TCP
 ```
 
-Enter `oc edit flowcollector`.  Again, look for the `ebpf` section and add the rest of the lines starting at `flowFilter`.  The `cidr` specifies a network address and prefix.  The example refers to any traffic, but for a specific network, use a value like `10.0.62.0/24`.  The feature is limited to one filter and many of the attributes can only have one value.  For more details, see the [flowFilter reference](https://github.com/netobserv/network-observability-operator/blob/main/docs/flowcollector-flows-netobserv-io-v1beta2.adoc#specagentebpfflowfilter).
+Enter `oc edit flowcollector`.  Again, look for the `ebpf` section and add the rest of the lines starting at `flowFilter`.  The `cidr` specifies a network address and prefix.  The example refers to any traffic, but for a specific network, use a value like `10.0.62.0/24`.  The feature is limited to one filter and many of the attributes can only have one value.  For more details, see the [flowFilter reference](https://github.com/netobserv/netobserv-operator/blob/main/docs/flowcollector-flows-netobserv-io-v1beta2.adoc#specagentebpfflowfilter).
 
 ### eBPF Agent metrics
 
@@ -174,7 +174,7 @@ _<div style="text-align: center">Figure 7: Not 'ip' filter</div>_
 
 In my [Network Observability 1.5 blog](https://developers.redhat.com/articles/2024/03/20/whats-new-network-observability-15), I covered the development preview of the FlowMetrics API.  While it's possible to take any [flow data labels](https://docs.openshift.com/container-platform/4.16/observability/network_observability/json-flows-format-reference.html) and turn it into a Prometheus metric, that web page was updated to indicate which fields can be safely used as labels to avoid high cardinality.
 
-This feature is now GA, and includes more filtering options (see [reference](https://github.com/netobserv/network-observability-operator/blob/main/docs/FlowMetric.md)) and support for [dashboards in OpenShift](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md#charts-openshift-only).  That link also has many more examples of using custom metrics.
+This feature is now GA, and includes more filtering options (see [reference](https://github.com/netobserv/netobserv-operator/blob/main/docs/FlowMetric.md)) and support for [dashboards in OpenShift](https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md#charts-openshift-only).  That link also has many more examples of using custom metrics.
 
 
 ## Network Observability CLI
@@ -188,7 +188,7 @@ It is also not just a subset of features of the Network Observability Operator. 
 ![netobserv_cli](images/netobserv_cli.png)
 _<div style="text-align: center">Figure 10: Network Observability CLI</div>_
 
-Follow the steps to [install the Network Observability CLI](https://docs.openshift.com/container-platform/4.16/observability/network_observability/netobserv_cli/netobserv-cli-install.html#network-observability-cli-install_netobserv-cli-install).
+Follow the steps to [install the Network Observability CLI](https://docs.openshift.com/container-platform/4.16/observability/network_observability/netobserv_cli/netobserv-cli-install.html#netobserv-cli-install_netobserv-cli-install).
 
 To get help, enter:
 
@@ -209,7 +209,7 @@ To stop the program, press ctrl-C.  More information about NetObserv CLI will be
 
 If you are hesitant about deploying Network Observability, fear not.  With Network Observability CLI, you can experiment and have it completely removed when you are done using it.  The second option lets you install Network Observability without Loki, while still providing the majority of the features of this operator.
 
-What are you waiting for?  Give it a try, and let us know what you think on the [discussion board](https://github.com/netobserv/network-observability-operator/discussions).
+What are you waiting for?  Give it a try, and let us know what you think on the [discussion board](https://github.com/netobserv/netobserv-operator/discussions).
 
 ---
 

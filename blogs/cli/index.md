@@ -53,7 +53,7 @@ oc krew install netobserv
 
 ### From tar archive
 
-Download the latest version either from [github releases](https://github.com/netobserv/network-observability-cli/releases) or [developers.redhat.com](https://developers.redhat.com/content-gateway/rest/mirror2/pub/openshift-v4/clients/netobserv/latest).
+Download the latest version either from [github releases](https://github.com/netobserv/netobserv-cli/releases) or [developers.redhat.com](https://developers.redhat.com/content-gateway/rest/mirror2/pub/openshift-v4/clients/netobserv/latest).
 
 Then follow the instructions on [Installing and using CLI plugins](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/extending-cli-plugins.html#cli-installing-plugins_cli-extend-plugins) from Openshift documentation.
 
@@ -82,7 +82,7 @@ oc netobserv help
 
 ```
 Netobserv allows you to capture flow and packets from your cluster.
-Find more information at: https://github.com/netobserv/network-observability-cli/
+Find more information at: https://github.com/netobserv/netobserv-cli/
 
 Syntax: netobserv [flows|packets|cleanup] [filters]
 
@@ -113,7 +113,7 @@ options:
   ```
 
 As you can see, the CLI offers two captures options for now:
-- `flows` to get network flows containing [enriched informations](https://github.com/netobserv/network-observability-operator/blob/main/docs/flows-format.adoc#network-flows-format-reference)
+- `flows` to get network flows containing [enriched informations](https://github.com/netobserv/netobserv-operator/blob/main/docs/flows-format.adoc#network-flows-format-reference)
 
 On top of this command, you can add extra features and filters. Example to capture `Round Trip Time` of `TCP` flows using port `80`:
 ```
@@ -440,4 +440,4 @@ It could become 'yet another' toolset of observing and debugging tools such as [
 We hope you liked this article !
 
 Netobserv is an OpenSource project [available on github](https://github.com/netobserv).
-Feel free to share your [ideas](https://github.com/netobserv/network-observability-operator/discussions/categories/ideas), [use cases](https://github.com/netobserv/network-observability-operator/discussions/categories/show-and-tell) or [ask the community for help](https://github.com/netobserv/network-observability-operator/discussions/categories/q-a).
+Feel free to share your [ideas](https://github.com/netobserv/netobserv-operator/discussions/categories/ideas), [use cases](https://github.com/netobserv/netobserv-operator/discussions/categories/show-and-tell) or [ask the community for help](https://github.com/netobserv/netobserv-operator/discussions/categories/q-a).
