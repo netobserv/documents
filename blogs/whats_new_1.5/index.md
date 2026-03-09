@@ -2,7 +2,7 @@
 
 Network Observability 1.5 is the new version of the operator from Red Hat that focuses on providing insights into networking.  There's an upstream version that runs on plain Kubernetes, but this blog will focus on using OpenShift Container Platform (OCP) and the OpenShift web console for the user interface.
 
-I will highlight the most important new features of this release so if you want a summary of all the changes including bug fixes, check out the [release notes](https://docs.openshift.com/container-platform/4.15/network_observability/network-observability-operator-release-notes.html).  If you want some background of this product, read the [OpenShift documentation](https://docs.openshift.com/container-platform/4.15/network_observability/network-observability-overview.html) and various [Red Hat blogs](https://www.redhat.com/en/blog) on this topic, including my blog on the previous [1.4 release](https://www.redhat.com/en/blog/whats-new-in-network-observability-1.4).
+I will highlight the most important new features of this release so if you want a summary of all the changes including bug fixes, check out the [release notes](https://docs.openshift.com/container-platform/4.15/network_observability/netobserv-operator-release-notes.html).  If you want some background of this product, read the [OpenShift documentation](https://docs.openshift.com/container-platform/4.15/network_observability/network-observability-overview.html) and various [Red Hat blogs](https://www.redhat.com/en/blog) on this topic, including my blog on the previous [1.4 release](https://www.redhat.com/en/blog/whats-new-in-network-observability-1.4).
 
 To get started, you should have an OpenShift cluster.  You will need to log in with a cluster-admin role.  Follow the [documentation steps](https://docs.openshift.com/container-platform/4.15/network_observability/installing-operators.html) to install **Network Observability** provided by Red Hat in **OperatorHub** on the OpenShift web console.
 
@@ -50,7 +50,7 @@ In "Processor configuration", the changes are to enable availability zones, clus
 ![Processor configuration](images/processor_configuration.png)
 _<div style="text-align: center">Figure 4: Processor configuration</div>_
 
-The full list of predefined metrics is [here](https://github.com/netobserv/network-observability-operator/blob/main/docs/Metrics.md).  When you include a metric, it stores it in Prometheus and is available as a Prometheus metric prefixed with "netobserv_".  For example, if you add the metric *namespace_egress_bytes_total*, then go to **Observe > Metrics** and enter the PromQL `sum(rate(netobserv_namespace_egress_bytes_total[1m]))`.  This should display a single line that is the sum of the average number of egress bytes over one-minute intervals.  Select a refresh time in the upper right dropdown if you want the graph to be updated periodically.
+The full list of predefined metrics is [here](https://github.com/netobserv/netobserv-operator/blob/main/docs/Metrics.md).  When you include a metric, it stores it in Prometheus and is available as a Prometheus metric prefixed with "netobserv_".  For example, if you add the metric *namespace_egress_bytes_total*, then go to **Observe > Metrics** and enter the PromQL `sum(rate(netobserv_namespace_egress_bytes_total[1m]))`.  This should display a single line that is the sum of the average number of egress bytes over one-minute intervals.  Select a refresh time in the upper right dropdown if you want the graph to be updated periodically.
 
 Availability zones and cluster ID will be covered in the traffic flow table section below.
 
@@ -177,4 +177,4 @@ When you create this instance or make any changes to FlowMetric, the flowlogs-pi
 
 ## Conclusion
 
-Hopefully, you are excited as I am on all the changes in this release.  I hope you get the chance to try it out, and let us know what you think!  You can always reach the NetObserv team on this [discussion board](https://github.com/netobserv/network-observability-operator/discussions).
+Hopefully, you are excited as I am on all the changes in this release.  I hope you get the chance to try it out, and let us know what you think!  You can always reach the NetObserv team on this [discussion board](https://github.com/netobserv/netobserv-operator/discussions).
