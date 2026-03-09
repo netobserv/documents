@@ -1,0 +1,14 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: l2-network
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1", 
+      "name": "my-l2-network", 
+      "type": "ovn-k8s-cni-overlay", 
+      "topology":"layer2", 
+      "mtu": 1400, 
+      "netAttachDefName": "mesh-arena/l2-network"
+    }
