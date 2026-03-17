@@ -57,4 +57,4 @@ We use GitHub's pull request system to merge contributions. The process is:
 
 The key words “MAY”, “MUST”, “MUST NOT”, and “SHOULD” in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-_Source: This policy was originally based the [Fedora Project policy](https://docs.fedoraproject.org/en-US/council/policy/ai-contribution-policy/)._
+_Source: This policy was originally based on the [Fedora Project policy](https://docs.fedoraproject.org/en-US/council/policy/ai-contribution-policy/)._
