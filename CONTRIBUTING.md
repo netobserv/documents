@@ -48,7 +48,7 @@ We use GitHub's pull request system to merge contributions. The process is:
 3. **Transparency**: You **MUST** disclose the use of AI tools when the significant part of the contribution is taken from a tool without changes. You **SHOULD** disclose the other uses of AI tools, where it might be useful. Routine use of assistive tools for correcting grammar and spelling, or for clarifying language, does not require disclosure.
 
   * Information about the use of AI tools will help us evaluate their impact, build new best practices and adjust existing processes.
-  * Disclosures are made where authorship is normally indicated. For contributions tracked in git, the recommended method is an `Assisted-by:` commit message trailer.
+  * Disclosures are made where authorship is normally indicated. For contributions tracked in git, the recommended method is an `Assisted-by:` mention either in the commit message trailer, or in the pull request description.
   * Examples:
     * `Assisted-by: generic LLM chatbot`
     * `Assisted-by: ChatGPTv5`
