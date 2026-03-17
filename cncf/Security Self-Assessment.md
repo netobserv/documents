@@ -48,11 +48,11 @@ SBOM of downstream builds are publicly available (e.g. https://quay.io/repositor
 
 ### Security Links
 
-TODO
+https://github.com/netobserv/netobserv-operator/tree/main?tab=security-ov-file#security-policy
 
 ## Overview
 
-NetObserv is a set of components used to observe network traffic by generating NetFlows from eBPF agents, enriching those flows with Kubernetes metadata, exporting them in various ways (logs, metrics, Kafka, IPFIX...), and finally providing a comprehensive visualization tool for making sense of that data, a network health dashboard, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator.
+NetObserv is a set of components used to observe network traffic by generating network flows from eBPF agents, enriching those flows with Kubernetes metadata, exporting them in various ways (logs, metrics, Kafka, IPFIX...), and finally providing a comprehensive visualization tool for making sense of that data, a network health dashboard, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator.
 
 ### Background
 
@@ -109,10 +109,10 @@ This document provides NetObserv maintainers and stakeholders with additional co
 | TLS version restriction   | Critical         | When TLS is used, minimum version is forced to 1.3. |
 | Non-root eBPF agents      | SecurityRelevant | Whenever possible, the eBPF agents run with fine-grained privileges (e.g. CAP_BPF) instead of full privileges. Some features, however, do require full privileges. |
 | Unprivileged eBPF agents  | SecurityRelevant | Using bpfman (a CNCF project) allows to run agents without privileges. Operations requiring elevated privileges are delegated to bpfman. |
-| Network policies          | SecurityRelevant | A network policy can be installed automatically to better isolate the communications of the NetObserv workloads. However, due to policies being somewhat CNI-dependent and the inherent risk of breaking communications with untested CNIs, this feature is not enabled by default, except with OVN-Kubernetes. |
-| Encrypted traffic         | SecurityRelevant | All servers are configured with TLS by default. In OpenShift, certificates are generated automatically. Else, they must be provided by the users. |
-| Authorized traffic (mTLS) | SecurityRelevant | Traffic between the eBPF agents and flowlogs-pipeline can be authorized on both sides (mTLS) when using with Kafka. It is planned to bring mTLS to other modes, without Kafka. When not using mTLS, it is highly recommended to protect the netobserv namespace with a network policy. |
-| RBAC-enforced stores      | SecurityRelevant | Multi-tenancy can be achieved when supported by the backend stores: e.g. Loki with the Loki Operator, Prometheus with Thanos. In that case, NetObserv can be configured to forward user tokens. |
+| Network policies          | SecurityRelevant | A built-in network policy can be installed automatically to better isolate the communications of the NetObserv workloads. However, due to policies being somewhat CNI-dependent and the inherent risk of breaking communications with untested CNIs, this feature is only enabled by default with OVN-Kubernetes. |
+| Encrypted traffic         | SecurityRelevant | All servers are configured with TLS by default. The helm chart includes certificates for cert-manager. |
+| Authorized traffic (mTLS) | SecurityRelevant | Traffic between the eBPF agents and flowlogs-pipeline can be authorized on both sides (mTLS). When not using mTLS, it is highly recommended to protect the netobserv namespace with a network policy. |
+<!-- | RBAC-enforced stores      | SecurityRelevant | Multi-tenancy can be achieved when supported by the backend stores: e.g. Loki with the Loki Operator, Prometheus with Thanos. In that case, NetObserv can be configured to forward user tokens. | -->
 
 ## Project Compliance
 
@@ -159,17 +159,17 @@ In order to secure the SDLC from development to deployment, the following measur
 
 ## Security Issue Resolution
 
-As a Red Hat product, security issues and procedures are described on the [Security Contacts and Procedures](https://access.redhat.com/security/team/contact/) page. The GitHub repositories have a SECURITY.md file where reporters can find this information.
+The project uses GitHub Private Vulnerability Reporting: see https://github.com/netobserv/netobserv-operator/tree/main?tab=security-ov-file#security-policy.
 
 ### Responsible Disclosure Practice
 
-The same page mentioned above describes the Responsible Disclosure Practice. An email should be send to the Red Hat Product Security team, who will engage the discussion with the project maintainers, and respond to the reporter.
+The same page mentioned above describes the Responsible Disclosure Practice.
 
 ### Incident Response
 
-In the event that a vulnerability is reported, the maintainer team, the Red Hat Product Security team and the reporter will collaborate to determine the validity and criticality of the report. Based on these findings, the fix will be triaged and the maintainer team will work to issue a patch in a timely manner.
+In the event that a vulnerability is reported, the maintainer team and the reporter will collaborate to determine the validity and criticality of the report. The process may also involve the Red Hat Product Security team. Based on these findings, the fix will be triaged and the maintainer team will work to issue a patch in a timely manner. If an embargo is declared, the collaboration may involve the creation of a temporary private fork.
 
-Patches will be made to the `main` and the latest release branches, and new releases (upstream and downstream) will be triggered. Information will be disseminated to the community through all appropriate outbound channels as soon as possible based on the circumstance.
+Patches will be made to the `main` branch and the latest release branch. New releases (upstream and downstream) will be triggered. Information will be disseminated to the community through all appropriate outbound channels as soon as possible based on the circumstance.
 
 ## Appendix
 

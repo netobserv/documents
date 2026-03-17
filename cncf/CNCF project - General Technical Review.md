@@ -19,17 +19,17 @@ These questions are to gather knowledge about the project. Project maintainers a
 - **Project:** NetObserv
 - **Project Version:** 1.11 and above
 - **Website:** https://netobserv.io/
-- **Date Updated:** 2026-02-10
+- **Date Updated:** 2026-03-17
 - **Template Version:** v1.0
 - **Description:** <!-- Short project description --> 
 
-NetObserv is a set of components used to observe network traffic by generating NetFlows from eBPF agents with zero-instrumentation, enriching those flows using a Kubernetes-aware configurable pipeline, exporting them in various ways (to Loki, Prometheus, Kafka, OpenTelemetry or IPFIX), providing a comprehensive web UI for visualization, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator, although they can also be used as standalones.
+NetObserv is a set of components used to observe the network traffic by generating network flows from eBPF agents with zero-instrumentation, enriching those flows using a Kubernetes-aware configurable pipeline, exporting them in various ways (to Loki, Prometheus, Kafka, OpenTelemetry or IPFIX), providing a comprehensive web UI for visualization, and a CLI. Those components are mainly designed to be deployed in Kubernetes via an integrated Operator, although they can also be used as standalones.
 
-The enriched NetFlows consist of basic 5-tuples information (IPs, ports…), metrics (bytes, packets, drops, latency…), kube metadata (pods, namespaces, services, owners), cloud data (zones), CNI data (network policy events), DNS (codes, qname) and more.
+The enriched network flows consist of basic 5-tuples information (IPs, ports…), metrics (bytes, packets, drops, latency…), Kubernetes metadata (pods, namespaces, services, owners), cloud data (zones), CNI data (network policy events), DNS (codes, qname) and more.
 
 The Network Health dashboard comes with its own set of health information derived from NetObserv data, and can also integrate data from other / third-party components, or customized data from users. An API is also provided for users to fully customize the generated metrics for their own use (e.g. for customized alerts).
 
-The CLI is a separate tool independent from the Operator, that provides similar functionality, but tailored for on-demand monitoring (as opposed to 24/7), and adds a packet capture (pcap) functionality.
+The CLI is a separate tool independent from the Operator, that provides similar functionality in a TUI, but tailored for on-demand monitoring (as opposed to 24/7), and adds a packet capture (pcap) functionality.
 
 NetObserv is largely CNI-agnostic, although some specific features can relate to a particular CNI (e.g: getting network events from ovn-kubernetes).
 
@@ -40,11 +40,11 @@ NetObserv is largely CNI-agnostic, although some specific features can relate to
 
 **Describe the roadmap process, how scope is determined for mid to long term features, as well as how the roadmap maps back to current contributions and maintainer ladder?**
 
-NetObserv has an upstream project and, currently, one known downstream/vendor product, which is Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index), for OpenShift.
+NetObserv is an upstream project and has, currently, one known downstream/vendor product, which is Red Hat [Network Observability](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_observability/index), for OpenShift.
 
 There is a high level [Kanban board](https://github.com/orgs/netobserv/projects/1/views/1) that lists the requested / accepted features upstream and tracks progress on them.
 
-Most of the maintainers (not all) work in parallel on the downstream product, but it must be noted that, most of the time, this work benefits equally to the upstream: there are pratically no downstream-only features, or very few. To take an example, while TLS & QUIC traffic observability is in the downstream roadmap, it will benefit to all users (and its development actually involves external contributions). So the question is less about how much work the maintainers team is doing for the upstream, than how to make it visible in the community roadmap. The main upstream+downstream features are mirrored in the Kanban board.
+Most of the maintainers (not all) work in parallel on the downstream product, but it must be noted that, most of the time, this work benefits equally to the upstream: there are pratically no downstream-only features, or very few. To take an example, while TLS & QUIC traffic observability is in the downstream roadmap, it will benefit to all users (its development actually involves external contributions). So the question is less about how much work the maintainers team is doing for the upstream, than how to make it visible in the community roadmap. The main upstream+downstream features are mirrored in the Kanban board.
 
 That said, there are also upstream-only features that are planned, and bugs fixes. The maintainers work regularly on them, often driven by the community interactions, either on Slack or on GitHub. It is nothing exceptional at Red Hat to have dedicated time for communities and upstream work. External contributions are welcome as well.
 
@@ -53,14 +53,15 @@ As of 2026, the biggest gap identified between upstream and downstream is produc
 - Secured defaults: [using TLS by default in the Helm install](https://github.com/netobserv/network-observability-operator/issues/2360).
 - Secured defaults: [increase cases of default-installed netpol](https://github.com/netobserv/network-observability-operator/issues/2491).
 - Upstream release process: [implement best practices](https://github.com/netobserv/network-observability-operator/issues/2490).
+- Upstream multi-tenancy: [Login & Multi-tenancy through the standalone web console](https://github.com/netobserv/netobserv-operator/issues/2554).
 
 This work is in progress.
 
 **Describe the target persona or user(s) for the project?**
 
-The project targets both cluster administrators and project teams. Cluster administrators have a cluster-wide view over all the network traffic, full topology, access to metrics and alerts. They can run packet-capture, they configure the cluster-scoped flow collection process.
+The upstream project currently targets just cluster administrators. They have a cluster-wide view over all the network traffic, full topology, access to metrics and alerts. They can run packet-capture, they configure the cluster-scoped flow collection process.
 
-Through multi-tenancy, project teams have access to a subset of the traffic and the related topology. They have limited configuration options, such as per-namespace sampling or traffic flagging.
+Through [planned multi-tenancy](https://github.com/netobserv/netobserv-operator/issues/2554), project teams will have access to a subset of the traffic and the related topology. They will have limited configuration options, such as per-namespace sampling or traffic flagging. Multi-tenancy is already partly implemented.
 
 **Explain the primary use case for the project. What additional use cases are supported by the project?**
 
@@ -111,15 +112,13 @@ As mentioned above, NetObserv leverages some features of OVN-Kubernetes, such as
 
 Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By doing so, the highly privileged operations, such as loading bpf programs in the kernel, are delegated to bpfman. It allows to run the eBPF agent unprivileged.
 
-In OpenShift / OKD, the web console comes as a plugin for the product console, ensuring a smooth integration. There could be a similar vendor-neutral integration, such as with Headlamp.
+In OpenShift / OKD, the web console comes as a plugin for the product console, ensuring a smooth integration. A possible future improvement is to build a similar vendor-neutral integration, such as with Headlamp.
 
 ### Design
 
 **Explain the design principles and best practices the project is following.**
 
-The project design principles and best practices are globally common to many Red Hat products. The development philosophy is "upstream first", meaning that there is no hidden code/feature that only downstream users would get. In fact, there is even no specific repository for downstream.
-
-All contributions happen on our GitHub repositories, which are public, go through code reviewing, automated testing, and generally manual testing. A special attention is given to performance: regressions are tracked with several tools, based on kube-burner.
+The development philosophy is "upstream first", meaning that there is no hidden code/feature that only downstream users would get. All contributions go to the upstream repository. They go through code reviewing, automated testing, and generally manual testing. A special attention is given to performance: regressions are tracked with several tools, based on kube-burner.
 
 We expect a reasonably high code quality standard, without being too picky on style matters. The goal is not to discourage new contributors.
 
@@ -127,7 +126,10 @@ All architectural decisions are made with care, and must be well balanced accord
 
 **Outline or link to the project’s architecture requirements? Describe how they differ for Proof of Concept, Development, Test and Production environments, as applicable.**
 
+The [Getting started guide](https://github.com/netobserv/netobserv-operator?tab=readme-ov-file#getting-started) describes the requirement and minimal configuration, and provides two installation commands, one as a standalone (that includes dependencies installation) and another without the dependencies, that can be used when those dependencies are already available, such as in an existing production environment.
 
+* For PoC, development or testing purpose, users can simply follow this quick starting guide.
+* For production, it is recommended to read through the full README and pay attention to the [Configuration](https://github.com/netobserv/netobserv-operator?tab=readme-ov-file#configuration), [Performance fine-tuning](https://github.com/netobserv/netobserv-operator?tab=readme-ov-file#performance-fine-tuning) and [Securing](https://github.com/netobserv/netobserv-operator?tab=readme-ov-file#securing-data-and-communications) sections.
 
 **Define any specific service dependencies the project relies on in the cluster.**
 
@@ -143,7 +145,7 @@ Finally, several services require TLS certificates, which by default are provide
 
 On the ingestion side, there is no Identity and Access Management other than with the components service accounts themselves, associated with RBAC permissions.
 
-On the consuming side, NetObserv does not implement by itself Identity and Access Management, however, when deployed as a plugin, all queries run against Loki or Prometheus forward the Authorization header, delegating this aspect to those backends. In a production-grade environment, Thanos and the Loki Operator can be used to enable multi-tenancy.
+On the consuming side, NetObserv does not currently implement by itself Identity and Access Management, which means it must currently be reserved for cluster admins. While multi-tenancy is possible in the downstream product (because the web console is deployed as a console plugin, where access management is delegated), it [needs some work](https://github.com/netobserv/netobserv-operator/issues/2554) to be enabled upstream. When this is done, all queries run against Loki or Prometheus will forward the Authorization header, delegating RBAC controls to those backends. In a production-grade environment, Thanos and the Loki Operator can be used to enable multi-tenancy.
 
 **Describe how the project has addressed sovereignty.**
 
@@ -217,12 +219,12 @@ Testing and validating the installation can be done by port-forwarding the web c
 **Please review the [Cloud Native Security Tenets](https://github.com/cncf/tag-security/blob/main/community/resources/security-whitepaper/secure-defaults-cloud-native-8.md) from TAG Security.**
 
 1. Make security a design requirement
-Security measures have been baked in from GA day-0, and continuously improved over time. For instance, from day-0, TLS / mTLS has been recommended through Kafka; RBAC and multi-tenancy supported via the Loki Operator; eBPF agents, running with elevated privileges, are segregated in a different namespace; fine-grained capabilities are favored whenever possible. A threat modeling as been done internally at Red Hat.
+Security measures have been baked in from GA day-0, and continuously improved over time. For instance, from day-0, TLS / mTLS has been recommended through Kafka; RBAC and multi-tenancy [will be supported](https://github.com/netobserv/netobserv-operator/issues/2554) via the Loki Operator; eBPF agents, running with elevated privileges, are segregated in a different namespace; fine-grained capabilities are favored whenever possible. A threat modeling has been done internally at Red Hat.
 2. Applying secure configuration has the best user experience
-Security by default is preferred, although not always possible. Servers use TLS by default. eBPF agents run in non-privileged mode by default.
+Security by default is preferred, although not always possible. When following the getting started guide, mTLS or simple TLS are used by default. eBPF agents run in non-privileged mode by default.
 Network policy is unfortunately not always installed by default, as it may blocks communications unexpectedly with some CNIs, but it does with OVN-Kubernetes.
 3. Selecting insecure configuration is a conscious decision
-Features that require the eBPF agent privileged mode will not automatically enable it: it remains a conscious decision.
+Features that require the eBPF agent privileged mode will not automatically enable it: it remains a conscious decision. Same for disabling TLS.
 4. Transition from insecure to secure state is possible
 All the configuration is managed through the Operator with a typical reconciliation, which ensures transitions work seemlessly, in one way or another.
 5. Secure defaults are inherited
@@ -232,11 +234,19 @@ N/A
 7. Secure defaults protect against pervasive vulnerability exploits.
 Containers run as non-root; Release pipeline includes vulnerability scans.
 8. Security limitations of a system are explainable
-While security limitations are not hidden, they may not be very visible. This is something added [to the roadmap](https://github.com/netobserv/network-observability-operator/issues/2491).
+When the built-in network policy cannot be installed by default (non-ovn-kubernetes case), the security implication is duly documented, and [help is provided](https://github.com/netobserv/netobserv-operator/blob/main/docs/NetworkPolicy.md) for users to build their own. Similarly, if users can't use the built-in TLS setup for whatever reasons, [help is provided](https://github.com/netobserv/netobserv-operator/blob/main/docs/TLS.md).
 
 **How do you recommend users alter security defaults in order to "loosen" the security of the project? Please link to any documentation the project has written concerning these use cases.**
 
-We are not currently emphasizing the security risks associated with relaxing the default settings. This is something we [plan to improve](https://github.com/netobserv/network-observability-operator/issues/2495).
+This is something we [plan to improve](https://github.com/netobserv/network-observability-operator/issues/2495). Risks associated with relaxed security is sometimes emphasized in the documentation and through validation webhook warnings, but not always, so we are planning a full review. Examples:
+
+- On disabling the built-in network policy:
+
+> When disabled, it is highly recommended to create network policies manually, to prevent undesired accesses.
+
+- On disabling TLS:
+
+> Disabling TLS results in a less secure deployment model.
 
 **Security Hygiene**
 
