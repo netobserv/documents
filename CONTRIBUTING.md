@@ -38,3 +38,23 @@ We use GitHub's pull request system to merge contributions. The process is:
 - There probably will be some back and forth discussion during the review process. You may be asked to change some parts of your code as a result. New changes should be added as new commits rather than amending / squashing the commits, so that reviewers can focus on the new diffs. Sometimes you may also have to rebase it.
 - As part of the continuous integration, there are some automated checks that will be executed in the PR. In general we want all of them to pass, however and unfortunately, some of them aren't 100% reliable and might fail for reasons unrelated to your changes. As a rule of thumb, the GitHub action checks (with the GitHub icon) are reliable and should always pass. If they don't, you probably broke something. If other checks don't pass, don't worry too much, the maintainers will check if it's ok anyway or not.
 - When you and the reviewers consider the PR is ready, it can finally be merged. Commits will be squashed in a single one (unless exception), then merged into the `main` branch.
+
+### AI-Assisted Contributions Policy
+
+1. You **MAY** use AI assistance for contributing to NetObserv, as long as you follow the principles described below.
+
+2. **Accountability**: You **MUST** take the responsibility for your contribution. Contributing to NetObserv means vouching for the quality, license compliance, and utility of your submission. All contributions, whether from a human author or assisted by large language models (LLMs) or other generative AI tools, must meet the project’s standards for inclusion. The contributor is always the author and is fully accountable for the entirety of these contributions.
+
+3. **Transparency**: You **MUST** disclose the use of AI tools when the significant part of the contribution is taken from a tool without changes. You **SHOULD** disclose the other uses of AI tools, where it might be useful. Routine use of assistive tools for correcting grammar and spelling, or for clarifying language, does not require disclosure.
+
+  * Information about the use of AI tools will help us evaluate their impact, build new best practices and adjust existing processes.
+  * Disclosures are made where authorship is normally indicated. For contributions tracked in git, the recommended method is an `Assisted-by:` commit message trailer.
+  * Examples:
+    * `Assisted-by: generic LLM chatbot`
+    * `Assisted-by: ChatGPTv5`
+
+4. **Contribution & Community Evaluation**: AI tools may be used to assist human reviewers by providing analysis and suggestions. You **MUST NOT** use AI as the sole or final arbiter in making a substantive or subjective judgment on a contribution. This does not prohibit the use of automated tooling for objective technical validation, such as CI/CD pipelines, automated testing, or spam filtering. The final accountability for accepting a contribution, even if implemented by an automated system, always rests with the human contributor who authorizes the action.
+
+The key words “MAY”, “MUST”, “MUST NOT”, and “SHOULD” in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+_Source: This policy was originally based the [Fedora Project policy](https://docs.fedoraproject.org/en-US/council/policy/ai-contribution-policy/)._
