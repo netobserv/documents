@@ -1,4 +1,4 @@
-## Contributing to the NetObserv projects
+# Contributing to the NetObserv projects
 
 These contribution guidelines apply to all projects / repositories in the [netobserv organization](https://github.com/netobserv/). Almost the source code is licensed under [Apache v2.0](https://www.apache.org/licenses/LICENSE-2.0.html), with the exception of our [BPF code](https://github.com/netobserv/netobserv-ebpf-agent/blob/e3089669f1fbc91cf56a19e190f5aa8d29aaa4ba/bpf/flows.c#L303) which is GPL.
 
@@ -6,11 +6,15 @@ Contributions can take the shape of pull requests for documentation or code chan
 
 There should be mutual respect between contributors and maintainers.
 
-### Security vulnerabilities
+## Project management and roadmap
+
+You can follow the project management and roadmap on GitHub: https://github.com/orgs/netobserv/projects/1.
+
+## Security vulnerabilities
 
 Unlike other contributions, if you think you discovered a security vulnerability, please do not report it publicly or even fix it publicly. Please follow the instructions described in the [GitHub private reporting process](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/privately-reporting-a-security-vulnerability) instead.
 
-### Documentation contributions
+## Documentation contributions
 
 Upstream (community) documentation can be found in their respective component repositories, either in the main README or in their `docs` directories. For example:
 
@@ -22,7 +26,7 @@ Upstream (community) documentation can be found in their respective component re
 
 For the documentation related to the downstream OpenShift product ([Network Observability](https://docs.openshift.com/container-platform/latest/observability/network_observability/netobserv-operator-release-notes.html)), you should follow the specific [OpenShift documentation guidelines](https://github.com/openshift/openshift-docs/blob/main/CONTRIBUTING.adoc). Still, don't hesitate to [get in touch with the team](https://github.com/netobserv/netobserv-operator/discussions) first.
 
-### Code contributions
+## Code contributions
 
 Code contributions are very welcome. As said, it's recommended to have a discussion prior to doing any large change. When adding a new feature, we need to understand which use case it is going to solve, and assess whether that is something the core development team is going to maintain in the long run, or if the maintenance can be delegated.
 
@@ -39,7 +43,7 @@ We use GitHub's pull request system to merge contributions. The process is:
 - As part of the continuous integration, there are some automated checks that will be executed in the PR. In general we want all of them to pass, however and unfortunately, some of them aren't 100% reliable and might fail for reasons unrelated to your changes. As a rule of thumb, the GitHub action checks (with the GitHub icon) are reliable and should always pass. If they don't, you probably broke something. If other checks don't pass, don't worry too much, the maintainers will check if it's ok anyway or not.
 - When you and the reviewers consider the PR is ready, it can finally be merged. Commits will be squashed in a single one (unless exception), then merged into the `main` branch.
 
-### AI-Assisted Contributions Policy
+## AI-Assisted Contributions Policy
 
 1. You **MAY** use AI assistance for contributing to NetObserv, as long as you follow the principles described below.
 
