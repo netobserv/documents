@@ -104,11 +104,13 @@ A special attention is paid to the UX with many small details, to quickly filter
 
 **Describe how this project integrates with other projects in a production environment.**
 
+NetObserv can theoritically integrate with any CNI, as long as they don't entirely by-pass the Linux kernel traffic controller. The project is regularly tested with Kindnet and OVN-Kubernetes by the maintainers. While other CNIs are not actively tested by the maintainers, we see occasional community contributions that indicate a broader usage, such as with Cilium and Calico.
+
+NetObserv leverages some specific features of OVN-Kubernetes, such as its Observability sampling mode, and User-Defined Networks.
+
 NetObserv can generate many metrics, ingested by Prometheus, and alerting rules for AlertManager. Users who already use them can leverage their existing setup.
 
 For comprehensive observability, NetObserv can also send the network flows to Grafana Loki, and/or export them to other systems by different means: using the IPFIX standard, or the OpenTelemetry protocol (as logs or as metrics), or to a Kafka broker. Those exporting options allow to integrate with many different systems (Splunk, ElasticSearch, etc.)
-
-As mentioned above, NetObserv leverages some features of OVN-Kubernetes, such as its Observability mode, and User-Defined Networks.
 
 Optionally, the eBPF agents can integrate with [bpfman](https://bpfman.io/). By doing so, the highly privileged operations, such as loading bpf programs in the kernel, are delegated to bpfman. It allows to run the eBPF agent unprivileged.
 
