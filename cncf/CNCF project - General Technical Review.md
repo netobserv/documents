@@ -104,7 +104,7 @@ A special attention is paid to the UX with many small details, to quickly filter
 
 **Describe how this project integrates with other projects in a production environment.**
 
-NetObserv can theoritically integrate with any CNI, as long as they don't entirely by-pass the Linux kernel traffic controller. The project is regularly tested with Kindnet and OVN-Kubernetes by the maintainers. While other CNIs are not actively tested by the maintainers, we see occasional community contributions that indicate a broader usage, such as with Cilium and Calico.
+NetObserv can theoretically integrate with any CNI, as long as they don't entirely by-pass the Linux kernel traffic controller. The project is regularly tested with Kindnet and OVN-Kubernetes by the maintainers. While other CNIs are not actively tested by the maintainers, we see occasional community contributions that indicate a broader usage, such as with Cilium and Calico.
 
 NetObserv leverages some specific features of OVN-Kubernetes, such as its Observability sampling mode, and User-Defined Networks.
 
