@@ -10,6 +10,10 @@ There should be mutual respect between contributors and maintainers.
 
 You can follow the project management and roadmap on GitHub: https://github.com/orgs/netobserv/projects/1.
 
+## Code of Conduct
+
+See [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
 ## Security vulnerabilities
 
 Unlike other contributions, if you think you discovered a security vulnerability, please do not report it publicly or even fix it publicly. Please follow the instructions described in the [GitHub private reporting process](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/privately-reporting-a-security-vulnerability) instead.
