@@ -47,6 +47,26 @@ We use GitHub's pull request system to merge contributions. The process is:
 - As part of the continuous integration, there are some automated checks that will be executed in the PR. In general we want all of them to pass, however and unfortunately, some of them aren't 100% reliable and might fail for reasons unrelated to your changes. As a rule of thumb, the GitHub action checks (with the GitHub icon) are reliable and should always pass. If they don't, you probably broke something. If other checks don't pass, don't worry too much, the maintainers will check if it's ok anyway or not.
 - When you and the reviewers consider the PR is ready, it can finally be merged. Commits will be squashed in a single one (unless exception), then merged into the `main` branch.
 
+## Sign Your Commits
+
+### DCO
+
+The Developer Certificate of Origin (DCO) is a lightweight way for contributors to certify that they wrote or otherwise have the right to submit the code they are contributing to the project. We require that contributors sign off on commits submitted to our project's repositories.
+
+You sign-off by adding the following to your commit messages. Your sign-off must match the git user and email associated with the commit.
+
+    This is my commit message
+
+    Signed-off-by: Your Name <your.name@example.com>
+
+Git has a `-s` command line option to do this automatically:
+
+    git commit -s -m 'This is my commit message'
+
+If you forgot to do this, you can amend your commit with the sign-off by running 
+
+    git commit --amend -s 
+
 ## AI-Assisted Contributions Policy
 
 1. You **MAY** use AI assistance for contributing to NetObserv, as long as you follow the principles described below.
